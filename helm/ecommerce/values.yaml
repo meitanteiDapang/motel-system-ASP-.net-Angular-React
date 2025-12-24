@@ -1,5 +1,9 @@
 web:
   servicePort: 80
+  image:
+    repository: acrecommercedev629.azurecr.io/web
+    tag: dev-latest
+
 
 api:
   servicePort: 80

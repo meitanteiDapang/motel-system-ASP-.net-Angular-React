@@ -1,12 +1,13 @@
-name: Deploy to AKS (dev)
+name: Build & Deploy Web to AKS (dev)
 
 on:
   workflow_dispatch:
   push:
     branches: ["main"]
     paths:
+      - "web/**"
       - "helm/**"
-      - ".github/workflows/deploy-dev.yml"
+      - ".github/workflows/build-and-deploy.yml"
 
 permissions:
   id-token: write
@@ -18,14 +19,23 @@ env:
   NAMESPACE: ecommerce
   RELEASE: ecommerce
   CHART_PATH: ./helm/ecommerce
+  ACR_NAME: acrecommercedev629
+  IMAGE_NAME: web
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
+      # 1. checkout code
       - name: Checkout
         uses: actions/checkout@v4
 
+      # 2. set image tag from git sha
+      - name: Set image tag from git sha
+        run: echo "IMAGE_TAG=dev-${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+      # 3. login to Azure (OIDC)
       - name: Azure login (OIDC)
         uses: azure/login@v2
         with:
@@ -33,19 +43,38 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+      # 4. login to ACR
+      - name: Login to ACR
+        run: az acr login -n $ACR_NAME
+
+      # 5. build & push React web image
+      - name: Build and push web image
+        run: |
+          ACR_LOGIN_SERVER=$(az acr show -n $ACR_NAME --query loginServer -o tsv)
+          echo "ACR_LOGIN_SERVER=$ACR_LOGIN_SERVER"
+
+          docker build \
+            -t $ACR_LOGIN_SERVER/$IMAGE_NAME:${IMAGE_TAG} \
+            ./web
+
+          docker push $ACR_LOGIN_SERVER/$IMAGE_NAME:${IMAGE_TAG}
+
+      # 6. set AKS context
       - name: Set AKS context
         uses: azure/aks-set-context@v4
         with:
           resource-group: ${{ env.RG }}
           cluster-name: ${{ env.AKS }}
 
+      # 7. deploy with Helm (use the SAME image tag)
       - name: Helm upgrade/install
         run: |
-          helm version
           helm upgrade --install $RELEASE $CHART_PATH \
             --namespace $NAMESPACE \
-            --create-namespace
+            --create-namespace \
+            --set web.image.tag=${IMAGE_TAG}
 
+      # 8. show status
       - name: Show status
         run: |
           kubectl get pods -n $NAMESPACE
