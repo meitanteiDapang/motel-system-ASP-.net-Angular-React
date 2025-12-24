@@ -23,16 +23,7 @@ spec:
     - host: {{ .Values.ingress.host | quote }}
       http:
         paths:
-          # /api/...  -> api service (strip "/api")
-          - path: /api/?(.*)
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: {{ .Release.Name }}-api
-                port:
-                  number: 80
-
-          # everything else -> web service
+          # everything -> web service
           - path: /(.*)
             pathType: ImplementationSpecific
             backend:
@@ -44,13 +35,6 @@ spec:
     # Catch-all rule so ingress IP works without Host header
     - http:
         paths:
-          - path: /api/?(.*)
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: {{ .Release.Name }}-api
-                port:
-                  number: 80
           - path: /(.*)
             pathType: ImplementationSpecific
             backend:
