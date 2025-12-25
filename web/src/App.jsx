@@ -1,99 +1,134 @@
-import { useEffect, useState } from 'react'
-import BookingPage from './booking/BookingPage.jsx'
-import BookingSuccessPage from './booking/BookingSuccessPage.jsx'
-import './App.css'
+import { useEffect, useState } from "react";
+import BookingPage from "./booking/BookingPage.jsx";
+import BookingSuccessPage from "./booking/BookingSuccessPage.jsx";
+import "./App.css";
 
 const parseRoute = () => {
   // Normalize hash so both "#booked" and "#/booked" work
-  const hash = window.location.hash.replace(/^#/, '').trim().replace(/^\/+/, '')
-  if (!hash) return { name: 'home' }
-  const [path, query] = hash.split('?')
-  if (path === 'book') {
-    const params = new URLSearchParams(query)
-    const roomTypeId = Number(params.get('roomTypeId'))
+  const hash = window.location.hash
+    .replace(/^#/, "")
+    .trim()
+    .replace(/^\/+/, "");
+  if (!hash) return { name: "home" };
+  const [path, query] = hash.split("?");
+  if (path === "book") {
+    const params = new URLSearchParams(query);
+    const roomTypeId = Number(params.get("roomTypeId"));
     return {
-      name: 'book',
+      name: "book",
       roomTypeId: Number.isFinite(roomTypeId) ? roomTypeId : null,
-    }
+    };
   }
-  if (path === 'booked') {
-    const params = new URLSearchParams(query)
-    const roomTypeId = Number(params.get('roomTypeId'))
+  if (path === "booked") {
+    const params = new URLSearchParams(query);
+    const roomTypeId = Number(params.get("roomTypeId"));
     return {
-      name: 'booked',
+      name: "booked",
       roomTypeId: Number.isFinite(roomTypeId) ? roomTypeId : null,
-    }
+    };
   }
-  return { name: 'home' }
-}
+  return { name: "home" };
+};
 
 function App() {
-  const [roomTypes, setRoomTypes] = useState({ loading: true, data: [], error: null })
-  const [route, setRoute] = useState(() => parseRoute())
+  const [roomTypes, setRoomTypes] = useState({
+    loading: true,
+    data: [],
+    error: null,
+  });
+  const [route, setRoute] = useState(() => parseRoute());
+  const [testProbe, setTestProbe] = useState({
+    loading: true,
+    data: null,
+    error: null,
+  });
 
   useEffect(() => {
-    const controller = new AbortController()
+    const controller = new AbortController();
 
     const fetchRoomTypes = async () => {
       try {
-        const res = await fetch('/api/room-types', { signal: controller.signal })
-        if (!res.ok) throw new Error(`HTTP ${res.status}`)
-        const data = await res.json()
-        setRoomTypes({ loading: false, data, error: null })
+        const res = await fetch("/api/room-types", {
+          signal: controller.signal,
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        setRoomTypes({ loading: false, data, error: null });
       } catch (err) {
-        if (err.name === 'AbortError') return
-        setRoomTypes({ loading: false, data: [], error: err })
+        if (err.name === "AbortError") return;
+        setRoomTypes({ loading: false, data: [], error: err });
       }
-    }
+    };
 
-    fetchRoomTypes()
+    fetchRoomTypes();
 
-    return () => controller.abort()
-  }, [])
+    return () => controller.abort();
+  }, []);
 
   useEffect(() => {
-    const handleHashChange = () => setRoute(parseRoute())
-    window.addEventListener('hashchange', handleHashChange)
-    return () => window.removeEventListener('hashchange', handleHashChange)
-  }, [])
+    const handleHashChange = () => setRoute(parseRoute());
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, []);
 
-  const heroImage = roomTypes.data[2]?.imageUrl || roomTypes.data[0]?.imageUrl || ''
+  useEffect(() => {
+    const controller = new AbortController();
+    const fetchTest = async () => {
+      try {
+        const res = await fetch("/api/test", { signal: controller.signal });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        setTestProbe({ loading: false, data, error: null });
+      } catch (err) {
+        if (err.name === "AbortError") return;
+        setTestProbe({ loading: false, data: null, error: err });
+      }
+    };
+
+    fetchTest();
+    return () => controller.abort();
+  }, []);
+
+  const heroImage =
+    roomTypes.data[2]?.imageUrl || roomTypes.data[0]?.imageUrl || "";
   const selectedRoom =
-    route.name === 'book' && route.roomTypeId
+    route.name === "book" && route.roomTypeId
       ? roomTypes.data.find((room) => room.id === route.roomTypeId)
-      : null
+      : null;
 
   const handleBook = (roomTypeId) => {
-    window.location.hash = `book?roomTypeId=${roomTypeId}`
-  }
+    window.location.hash = `book?roomTypeId=${roomTypeId}`;
+  };
 
-  if (route.name === 'book') {
+  if (route.name === "book") {
     return (
       <BookingPage
         roomType={selectedRoom}
         loading={roomTypes.loading}
         error={roomTypes.error}
         onBack={() => {
-          window.location.hash = ''
+          window.location.hash = "";
         }}
         onSuccess={(bookingId) => {
-          const roomTypeId = selectedRoom?.id ? `roomTypeId=${selectedRoom.id}` : ''
-          const suffix = roomTypeId ? `?${roomTypeId}` : ''
-          window.location.hash = `booked${suffix}`
+          const roomTypeId = selectedRoom?.id
+            ? `roomTypeId=${selectedRoom.id}`
+            : "";
+          const suffix = roomTypeId ? `?${roomTypeId}` : "";
+          window.location.hash = `booked${suffix}`;
         }}
       />
-    )
+    );
   }
 
-  if (route.name === 'booked') {
+  if (route.name === "booked") {
     return (
       <BookingSuccessPage
         roomType={selectedRoom}
         onBack={() => {
-          window.location.hash = ''
+          window.location.hash = "";
         }}
       />
-    )
+    );
   }
 
   return (
@@ -105,8 +140,42 @@ function App() {
         <div className="nav">
           <div className="logo">Dapang motel</div>
           <div className="nav-actions">
-            <span className="pill loud">Dapang is a cat. The motel is his.</span>
+            <span className="pill loud">
+              Dapang is a cat. The motel is his.
+            </span>
             <span className="pill">Check-in 24/7 · Ocean breeze</span>
+          </div>
+        </div>
+
+        <div className="booking-test">
+          <div className="test-card">
+            <div>
+              <p className="eyebrow">API probe</p>
+              <h2>Live test ping</h2>
+              <p className="subtext">
+                We call the backend test endpoint and surface its reply.
+              </p>
+            </div>
+            <div className="test-result">
+              {testProbe.loading && (
+                <span className="pill">Contacting /api/test ...</span>
+              )}
+              {testProbe.error && (
+                <span className="pill error-pill">
+                  Failed: {testProbe.error.message ?? "Unknown error"}
+                </span>
+              )}
+              {testProbe.data && !testProbe.error && (
+                <div className="pill success-pill">
+                  <div>{testProbe.data.message}</div>
+                  {testProbe.data.timestamp && (
+                    <div className="pill-subtext">
+                      {new Date(testProbe.data.timestamp).toLocaleString()}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -114,13 +183,13 @@ function App() {
           <div className="hero-copy">
             <p className="eyebrow">Boutique cat motel · Auckland shoreline</p>
             <h1>
-              A louder, brighter, cozier stay—curated by <span>Dapang</span>, resident king
-              of naps and neon.
+              A louder, brighter, cozier stay—curated by <span>Dapang</span>,
+              resident king of naps and neon.
             </h1>
             <p className="lede">
-              Think pastel mornings, citrus sunsets, chrome accents, and a cat who owns the
-              lobby. Rooms glow, vinyl hums, and the concierge knows where Dapang hides the
-              best sunbeams.
+              Think pastel mornings, citrus sunsets, chrome accents, and a cat
+              who owns the lobby. Rooms glow, vinyl hums, and the concierge
+              knows where Dapang hides the best sunbeams.
             </p>
             <div className="meta meta-bright">
               <div>
@@ -144,9 +213,15 @@ function App() {
               <div className="hero-frame bright-frame">
                 <div className="frame-inner">
                   {heroImage ? (
-                    <img src={heroImage} alt="Featured room" className="frame-img" />
+                    <img
+                      src={heroImage}
+                      alt="Featured room"
+                      className="frame-img"
+                    />
                   ) : (
-                    <div className="frame-img frame-fallback">Loading room...</div>
+                    <div className="frame-img frame-fallback">
+                      Loading room...
+                    </div>
                   )}
                   <div className="frame-overlay">
                     <div className="frame-text">After-dark patrols</div>
@@ -158,7 +233,9 @@ function App() {
                   </div>
                 </div>
               </div>
-              <div className="hero-caption">Chrome, candy glass, and cat-approved corners.</div>
+              <div className="hero-caption">
+                Chrome, candy glass, and cat-approved corners.
+              </div>
             </div>
           </div>
         </div>
@@ -171,7 +248,9 @@ function App() {
         </div>
         {roomTypes.loading && <p className="subtext">Loading room types...</p>}
         {roomTypes.error && (
-          <p className="subtext error-text">Failed to load room types: {roomTypes.error.message}</p>
+          <p className="subtext error-text">
+            Failed to load room types: {roomTypes.error.message}
+          </p>
         )}
         {!roomTypes.loading && !roomTypes.error && (
           <div className="grid three">
@@ -182,10 +261,14 @@ function App() {
                 </div>
                 <h3>{room.typeName}</h3>
                 <p>
-                  {room.bedNumber} beds · ${room.price} · {room.availableRoomsNumber} rooms
+                  {room.bedNumber} beds · ${room.price}
                 </p>
                 <div className="card-actions">
-                  <button className="book-btn" type="button" onClick={() => handleBook(room.id)}>
+                  <button
+                    className="book-btn"
+                    type="button"
+                    onClick={() => handleBook(room.id)}
+                  >
                     Book
                   </button>
                 </div>
@@ -199,34 +282,22 @@ function App() {
         <div className="contact-card">
           <div>
             <p className="eyebrow">Location</p>
-            <h2>Dapang motel · 21 Coastline Road, Auckland</h2>
-            <p className="subtext">
-              Follow the neon pawprints. Bright lobbies, ocean air, and a cat waiting to show
-              you his favorite chair.
-            </p>
+            <h2>Dapang motel · 711 Dapang Road, Dapang City</h2>
           </div>
           <div className="contact-meta">
             <div>
               <p className="label">Phone</p>
-              <p className="value">+64 9 555 4321</p>
+              <p className="value">+64 20 424 5777</p>
             </div>
             <div>
               <p className="label">Email</p>
-              <p className="value">stay@dapangmotel.com</p>
-            </div>
-            <div>
-              <p className="label">Mascot</p>
-              <p className="value">Dapang the cat</p>
-            </div>
-            <div>
-              <p className="label">Vibe</p>
-              <p className="value">Neon plush</p>
+              <p className="value">dapang@dapangmotel.com</p>
             </div>
           </div>
         </div>
       </section>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
