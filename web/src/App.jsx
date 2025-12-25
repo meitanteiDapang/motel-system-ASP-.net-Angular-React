@@ -1,8 +1,35 @@
 import { useEffect, useState } from 'react'
+import BookingPage from './booking/BookingPage.jsx'
+import BookingSuccessPage from './booking/BookingSuccessPage.jsx'
 import './App.css'
+
+const parseRoute = () => {
+  // Normalize hash so both "#booked" and "#/booked" work
+  const hash = window.location.hash.replace(/^#/, '').trim().replace(/^\/+/, '')
+  if (!hash) return { name: 'home' }
+  const [path, query] = hash.split('?')
+  if (path === 'book') {
+    const params = new URLSearchParams(query)
+    const roomTypeId = Number(params.get('roomTypeId'))
+    return {
+      name: 'book',
+      roomTypeId: Number.isFinite(roomTypeId) ? roomTypeId : null,
+    }
+  }
+  if (path === 'booked') {
+    const params = new URLSearchParams(query)
+    const roomTypeId = Number(params.get('roomTypeId'))
+    return {
+      name: 'booked',
+      roomTypeId: Number.isFinite(roomTypeId) ? roomTypeId : null,
+    }
+  }
+  return { name: 'home' }
+}
 
 function App() {
   const [roomTypes, setRoomTypes] = useState({ loading: true, data: [], error: null })
+  const [route, setRoute] = useState(() => parseRoute())
 
   useEffect(() => {
     const controller = new AbortController()
@@ -24,7 +51,50 @@ function App() {
     return () => controller.abort()
   }, [])
 
+  useEffect(() => {
+    const handleHashChange = () => setRoute(parseRoute())
+    window.addEventListener('hashchange', handleHashChange)
+    return () => window.removeEventListener('hashchange', handleHashChange)
+  }, [])
+
   const heroImage = roomTypes.data[2]?.imageUrl || roomTypes.data[0]?.imageUrl || ''
+  const selectedRoom =
+    route.name === 'book' && route.roomTypeId
+      ? roomTypes.data.find((room) => room.id === route.roomTypeId)
+      : null
+
+  const handleBook = (roomTypeId) => {
+    window.location.hash = `book?roomTypeId=${roomTypeId}`
+  }
+
+  if (route.name === 'book') {
+    return (
+      <BookingPage
+        roomType={selectedRoom}
+        loading={roomTypes.loading}
+        error={roomTypes.error}
+        onBack={() => {
+          window.location.hash = ''
+        }}
+        onSuccess={(bookingId) => {
+          const roomTypeId = selectedRoom?.id ? `roomTypeId=${selectedRoom.id}` : ''
+          const suffix = roomTypeId ? `?${roomTypeId}` : ''
+          window.location.hash = `booked${suffix}`
+        }}
+      />
+    )
+  }
+
+  if (route.name === 'booked') {
+    return (
+      <BookingSuccessPage
+        roomType={selectedRoom}
+        onBack={() => {
+          window.location.hash = ''
+        }}
+      />
+    )
+  }
 
   return (
     <div className="page bright">
@@ -97,11 +167,7 @@ function App() {
       <section className="section highlights">
         <div className="section-header">
           <p className="eyebrow">Dapang manifesto</p>
-          <h2>Everything is plush, bright, and unapologetically cozy.</h2>
-          <p className="subtext">
-            Cushions like clouds, citrus mist in the hallways, records spinning in the lounge,
-            and sunbeams reserved for the feline founder.
-          </p>
+          <h2>Book your stay now!</h2>
         </div>
         {roomTypes.loading && <p className="subtext">Loading room types...</p>}
         {roomTypes.error && (
@@ -116,8 +182,13 @@ function App() {
                 </div>
                 <h3>{room.typeName}</h3>
                 <p>
-                  {room.bedNumber} beds · ${room.price}
+                  {room.bedNumber} beds · ${room.price} · {room.availableRoomsNumber} rooms
                 </p>
+                <div className="card-actions">
+                  <button className="book-btn" type="button" onClick={() => handleBook(room.id)}>
+                    Book
+                  </button>
+                </div>
               </div>
             ))}
           </div>

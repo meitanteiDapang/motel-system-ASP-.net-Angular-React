@@ -373,6 +373,40 @@ body {
   color: #324863;
 }
 
+.card-actions {
+  margin-top: 12px;
+}
+
+.book-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background: #ffb0d7;
+  color: #0f1626;
+  box-shadow: 0 12px 30px rgba(255, 176, 215, 0.45);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.book-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 36px rgba(255, 176, 215, 0.55);
+}
+
+.book-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.book-btn.primary {
+  width: 100%;
+  justify-content: center;
+}
+
 .img-wrap {
   border-radius: 14px;
   overflow: hidden;
@@ -389,13 +423,108 @@ body {
   transition: transform 0.25s ease;
 }
 
+.img-wrap.square {
+  aspect-ratio: 1 / 1;
+}
+
+.img-wrap.square img {
+  height: 100%;
+}
+
 .error-text {
   color: #d43c62;
   font-weight: 700;
 }
 
+.success-text {
+  color: #1c7c5b;
+  font-weight: 700;
+}
+
 .img-wrap:hover img {
   transform: scale(1.03);
+}
+
+.booking-page {
+  min-height: 100vh;
+  padding: clamp(24px, 4vw, 48px);
+  background: linear-gradient(160deg, #fff4ef, #f6f8ff 55%, #f0fbff 100%);
+}
+
+.booking-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.back-btn {
+  border: none;
+  background: transparent;
+  color: #0f1626;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 6px 0;
+}
+
+.booking-card {
+  border-radius: 24px;
+  border: 1px solid rgba(15, 22, 38, 0.08);
+  background: rgba(255, 255, 255, 0.85);
+  padding: clamp(20px, 5vw, 36px);
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.12);
+}
+
+.booking-success {
+  display: grid;
+  gap: 12px;
+  text-align: center;
+  justify-items: center;
+}
+
+.booking-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(20px, 4vw, 40px);
+}
+
+.booking-summary h2 {
+  margin: 12px 0 6px;
+}
+
+.booking-form {
+  display: grid;
+  gap: 14px;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+  font-weight: 600;
+  color: #0f1626;
+}
+
+.field input {
+  border-radius: 12px;
+  border: 1px solid rgba(15, 22, 38, 0.15);
+  padding: 12px 14px;
+  font-size: 15px;
+  font-family: inherit;
+}
+
+.availability {
+  font-size: 14px;
+  font-weight: 600;
+  color: #324863;
+}
+
+.availability-ok {
+  color: #1c7c5b;
+}
+
+.availability-bad {
+  color: #d43c62;
 }
 
 .contact-card {
@@ -431,6 +560,10 @@ body {
 
 @media (max-width: 1024px) {
   .hero-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .booking-grid {
     grid-template-columns: 1fr;
   }
 

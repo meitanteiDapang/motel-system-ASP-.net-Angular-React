@@ -17,6 +17,7 @@ var app = builder.Build();
 app.MapHealthEndpoints();
 app.MapInfoEndpoints();
 app.MapRoomTypeEndpoints();
+app.MapBookingEndpoints();
 
 app.MapGet("/", () => Results.Redirect("/api/health"));
 
