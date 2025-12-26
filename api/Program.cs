@@ -1,5 +1,6 @@
 using Ecommerce.Api.Endpoints;
-using Npgsql;
+using Ecommerce.Api.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseUrls("http://0.0.0.0:8080");
@@ -10,7 +11,8 @@ var connectionString =
     ?? Environment.GetEnvironmentVariable("DATABASE_URL")
     ?? "Host=localhost;Port=5432;Username=app;Password=app_pw;Database=appdb";
 
-builder.Services.AddSingleton<NpgsqlDataSource>(_ => new NpgsqlDataSourceBuilder(connectionString).Build());
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(connectionString));
 
 var app = builder.Build();
 
