@@ -10,7 +10,7 @@ public static class RoomTypeEndpoints
 {
     public static IEndpointRouteBuilder MapRoomTypeEndpoints(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapGet("/api/room-types", GetRoomTypes);
+        endpoints.MapGet("/room-types", GetRoomTypes);
         return endpoints;
     }
 

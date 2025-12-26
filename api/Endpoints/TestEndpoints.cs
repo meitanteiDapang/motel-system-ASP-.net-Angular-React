@@ -7,7 +7,7 @@ public static class TestEndpoints
 {
     public static IEndpointRouteBuilder MapTestEndpoints(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapGet("/api/test", GetTest);
+        endpoints.MapGet("/test", GetTest);
         return endpoints;
     }
 

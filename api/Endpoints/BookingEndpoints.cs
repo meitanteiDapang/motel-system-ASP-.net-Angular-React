@@ -10,8 +10,8 @@ public static class BookingEndpoints
 {
     public static IEndpointRouteBuilder MapBookingEndpoints(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapGet("/api/bookings/availability", GetAvailability);
-        endpoints.MapPost("/api/bookings", CreateBooking);
+        endpoints.MapGet("/bookings/availability", GetAvailability);
+        endpoints.MapPost("/bookings", CreateBooking);
         return endpoints;
     }
 

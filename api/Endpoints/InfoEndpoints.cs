@@ -6,7 +6,7 @@ public static class InfoEndpoints
 {
     public static IEndpointRouteBuilder MapInfoEndpoints(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapGet("/api/info", () =>
+        endpoints.MapGet("/info", () =>
             Results.Ok(new
             {
                 service = "ecommerce-api",
