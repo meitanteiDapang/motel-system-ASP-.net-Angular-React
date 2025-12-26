@@ -10,19 +10,19 @@ public static class BookingEndpoints
 {
     public static IEndpointRouteBuilder MapBookingEndpoints(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapGet("/bookings/availability", GetAvailability);
+        endpoints.MapGet("/room-types/{roomTypeId:int}/availability", GetAvailability);
         endpoints.MapPost("/bookings", CreateBooking);
         return endpoints;
     }
 
     private static async Task<IResult> GetAvailability(
-        int? roomTypeId,
+        int roomTypeId,
         string? date,
         AppDbContext db,
         CancellationToken cancellationToken = default
     )
     {
-        if (roomTypeId is null || roomTypeId <= 0 || string.IsNullOrWhiteSpace(date))
+        if (roomTypeId <= 0 || string.IsNullOrWhiteSpace(date))
         {
             return Results.BadRequest(new { message = "roomTypeId and date are required." });
         }
@@ -33,7 +33,7 @@ public static class BookingEndpoints
         }
 
         var roomType = await db.RoomTypes
-            .Where(rt => rt.Id == roomTypeId.Value)
+            .Where(rt => rt.Id == roomTypeId)
             .Select(rt => new { rt.Id, rt.AvailableRoomsNumber })
             .SingleOrDefaultAsync(cancellationToken);
 
@@ -104,7 +104,7 @@ public static class BookingEndpoints
         db.Bookings.Add(booking);
         await db.SaveChangesAsync(cancellationToken);
 
-        return Results.Ok(new { id = booking.Id });
+        return Results.Created($"/bookings/{booking.Id}", new { id = booking.Id });
     }
 
     private sealed record CreateBookingRequest(

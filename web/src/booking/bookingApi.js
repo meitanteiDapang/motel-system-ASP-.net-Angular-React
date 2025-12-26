@@ -1,8 +1,8 @@
 import { apiUrl } from '../apiClient'
 
 export const fetchAvailability = async ({ roomTypeId, date }) => {
-  const params = new URLSearchParams({ roomTypeId: String(roomTypeId), date })
-  const res = await fetch(apiUrl(`/bookings/availability?${params.toString()}`))
+  const params = new URLSearchParams({ date })
+  const res = await fetch(apiUrl(`/room-types/${roomTypeId}/availability?${params.toString()}`))
   if (!res.ok) {
     throw new Error(`Failed to check availability (HTTP ${res.status})`)
   }
