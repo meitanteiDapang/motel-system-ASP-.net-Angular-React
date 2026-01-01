@@ -19,7 +19,7 @@ public class HappySubscriber
     public static int happy_count = 0;
 
 // TODO: what should i do if i want return value in the list
-    public List<int> iteratorList = [7, 8, 9];
+    public List<int> iteratorList = [7,  8, 9];
 
     public IEnumerator<int> getList()
     {
