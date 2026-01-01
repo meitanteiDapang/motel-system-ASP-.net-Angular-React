@@ -1,24 +1,25 @@
-import type { MouseEvent } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useRoomTypes } from '../hooks/useRoomTypes'
-import { useTestProbe } from '../hooks/useTestProbe'
-import type { RoomType } from '../types'
+import type { MouseEvent } from "react";
+import { useNavigate } from "react-router-dom";
+import { useRoomTypes } from "../hooks/useRoomTypes";
+import { useTestProbe } from "../hooks/useTestProbe";
+import type { RoomType } from "../types";
 
 const HomePage = () => {
-  const navigate = useNavigate()
-  const roomTypes = useRoomTypes()
-  const testProbe = useTestProbe()
+  const navigate = useNavigate();
+  const roomTypes = useRoomTypes();
+  const testProbe = useTestProbe();
 
-  const heroImage = roomTypes.data[2]?.imageUrl || roomTypes.data[0]?.imageUrl || ''
+  const heroImage =
+    roomTypes.data[2]?.imageUrl || roomTypes.data[0]?.imageUrl || "";
 
-  const handleBook = (roomTypeId: RoomType['id']) => {
-    navigate(`/book?roomTypeId=${roomTypeId}`)
-  }
+  const handleBook = (roomTypeId: RoomType["id"]) => {
+    navigate(`/book?roomTypeId=${roomTypeId}`);
+  };
 
   const handleAdminEntry = (event: MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault()
-    navigate('/adminLogin')
-  }
+    event.preventDefault();
+    navigate("/adminLogin");
+  };
 
   return (
     <div className="page bright">
@@ -29,9 +30,6 @@ const HomePage = () => {
         <div className="nav">
           <div className="logo">Dapang motel</div>
           <div className="nav-actions">
-            <span className="pill loud">
-              Dapang is a cat. The motel is his.
-            </span>
             <span className="pill">Check-in 24/7 · Ocean breeze</span>
             <button
               className="admin-link"
@@ -43,53 +41,20 @@ const HomePage = () => {
           </div>
         </div>
 
-        <div className="booking-test">
-          <div className="test-card">
-            <div>
-              <p className="eyebrow">API probe</p>
-              <h2>Live test ping</h2>
-              <p className="subtext">
-                We call the backend test endpoint and surface its reply.
-              </p>
-            </div>
-            <div className="test-result">
-              {testProbe.loading && (
-                <span className="pill">Contacting API...</span>
-              )}
-              {testProbe.error && (
-                <span className="pill error-pill">
-                  Failed: {testProbe.error.message ?? 'Unknown error'}
-                </span>
-              )}
-              {testProbe.data && !testProbe.error && (
-                <div className="pill success-pill">
-                  <div>{testProbe.data.message}</div>
-                  {testProbe.data.timestamp && (
-                    <div className="pill-subtext">
-                      {new Date(testProbe.data.timestamp).toLocaleString()}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
         <div className="hero-grid">
           <div className="hero-copy">
-            <p className="eyebrow">Boutique cat motel · Auckland shoreline</p>
+            <p className="eyebrow">Boutique cat motel</p>
             <h1>
-              A louder, brighter, cozier stay—curated by{" "}
-              <span>Dapang</span>, resident king of naps and neon.
+              A happy hotel created by <span>Dapang</span>,
+              resident king of naps and neon.
             </h1>
             <p className="lede">
-              Think pastel mornings, citrus sunsets, chrome accents, and a cat
-              who owns the lobby. Rooms glow, vinyl hums, and the concierge
-              knows where Dapang hides the best sunbeams.
+              Enjoy a warm, comfortable stay with friendly service and cozy
+              rooms. Relax, recharge, and feel at home during your visit.
             </p>
             <div className="meta meta-bright">
               <div>
-                <strong>4.9</strong> Guest rating
+                <strong>9.9</strong> Guest rating
               </div>
               <div>
                 <strong>12</strong> Suites blessed by Dapang
@@ -101,36 +66,23 @@ const HomePage = () => {
           </div>
 
           <div className="hero-card hero-card-bright">
-            <div className="card-top">
-              <div className="chip loud">Sunrise candy</div>
-              <div className="chip dark">Dapang-approved</div>
-            </div>
-            <div className="hero-visual hero-visual-bright">
-              <div className="hero-frame bright-frame">
-                <div className="frame-inner">
-                  {heroImage ? (
-                    <img
-                      src={heroImage}
-                      alt="Featured room"
-                      className="frame-img"
-                    />
-                  ) : (
-                    <div className="frame-img frame-fallback">
-                      Loading room...
-                    </div>
-                  )}
-                  <div className="frame-overlay">
-                    <div className="frame-text">After-dark patrols</div>
-                    <div className="frame-stats">
-                      <span>Neon lamps</span>
-                      <span>Ocean hush</span>
-                      <span>Soft paws</span>
-                    </div>
-                  </div>
+            <div className="frame-inner">
+              {heroImage ? (
+                <img
+                  src={heroImage}
+                  alt="Featured room"
+                  className="frame-img"
+                />
+              ) : (
+                <div className="frame-img frame-fallback">Loading room...</div>
+              )}
+              <div className="frame-overlay">
+                <div className="frame-text">After-dark patrols</div>
+                <div className="frame-stats">
+                  <span>Neon lamps</span>
+                  <span>Ocean hush</span>
+                  <span>Soft paws</span>
                 </div>
-              </div>
-              <div className="hero-caption">
-                Chrome, candy glass, and cat-approved corners.
               </div>
             </div>
           </div>
@@ -183,7 +135,7 @@ const HomePage = () => {
           <div className="contact-meta">
             <div>
               <p className="label">Phone</p>
-              <p className="value">+64 20 424 5777</p>
+              <p className="value">+64 11 111 1111</p>
             </div>
             <div>
               <p className="label">Email</p>
@@ -192,8 +144,40 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-    </div>
-  )
-}
 
-export default HomePage
+      <div className="booking-test">
+        <div className="test-card">
+          <div>
+            <p className="eyebrow">API probe</p>
+            <h2>Live test ping</h2>
+            <p className="subtext">
+              We call the backend test endpoint and surface its reply.
+            </p>
+          </div>
+          <div className="test-result">
+            {testProbe.loading && (
+              <span className="pill">Contacting API...</span>
+            )}
+            {testProbe.error && (
+              <span className="pill error-pill">
+                Failed: {testProbe.error.message ?? "Unknown error"}
+              </span>
+            )}
+            {testProbe.data && !testProbe.error && (
+              <div className="pill success-pill">
+                <div>{testProbe.data.message}</div>
+                {testProbe.data.timestamp && (
+                  <div className="pill-subtext">
+                    {new Date(testProbe.data.timestamp).toLocaleString()}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default HomePage;

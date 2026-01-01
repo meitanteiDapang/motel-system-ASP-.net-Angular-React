@@ -1,6 +1,8 @@
+using Ecommerce.Api.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.Api.Admin;
 
@@ -13,11 +15,26 @@ public static class LoadBookingsEndpoints
         return endpoints;
     }
 
-    private static IResult GetLoadBookings()
+    private static async Task<IResult> GetLoadBookings(
+        AppDbContext db,
+        CancellationToken cancellationToken = default
+    )
     {
-        return Results.Ok(new
-        {
-            message = "happy"
-        });
+        var bookings = await db.Bookings
+            .AsNoTracking()
+            .OrderByDescending(booking => booking.BookingDate)
+            .ThenByDescending(booking => booking.Id)
+            .Select(booking => new
+            {
+                booking.Id,
+                booking.RoomTypeId,
+                BookingDate = booking.BookingDate.ToString("yyyy-MM-dd"),
+                booking.GuestName,
+                booking.GuestEmail,
+                booking.GuestPhone
+            })
+            .ToListAsync(cancellationToken);
+
+        return Results.Ok(new { bookings });
     }
 }

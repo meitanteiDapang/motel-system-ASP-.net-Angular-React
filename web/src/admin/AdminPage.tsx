@@ -5,11 +5,20 @@ import './AdminPage.css'
 import { useEffect, useState } from 'react'
 import { apiUrl } from '../apiClient'
 
+type AdminBooking = {
+  id?: number
+  roomTypeId?: number
+  bookingDate?: string
+  guestName?: string
+  guestEmail?: string
+  guestPhone?: string
+}
 
 const AdminPage = () => {
   const navigate = useNavigate()
   const globalContext = useGlobalContext()
-  const [adminTestMessage, setAdminTestMessage] = useState('')
+  const [bookings, setBookings] = useState<AdminBooking[]>([])
+  const [loadError, setLoadError] = useState<string | null>(null)
   const token = globalContext.state.adminToken
 
 
@@ -38,21 +47,30 @@ const AdminPage = () => {
         if (!isActive) return
 
         const data = await res.json().catch(() => null)
-        if (res.ok) {
-          const message = (data as { message?: string } | null)?.message ?? 'ok'
-          setAdminTestMessage(message)
+        if (!res.ok) {
+          const errorMessage = (data as { message?: string } | null)?.message ?? `HTTP ${res.status}`
+          setLoadError(errorMessage)
+          setBookings([])
           return
         }
 
-        const errorMessage = (data as { message?: string } | null)?.message ?? `HTTP ${res.status}`
-        setAdminTestMessage(errorMessage)
+        const payload = data as { bookings?: unknown } | unknown[]
+        const items = Array.isArray(payload)
+          ? payload
+          : Array.isArray((payload as { bookings?: unknown }).bookings)
+            ? (payload as { bookings: unknown[] }).bookings
+            : []
+        setBookings(items as AdminBooking[])
+        setLoadError(null)
       } catch (err) {
         if (!isActive) return
         if (err instanceof Error) {
-          setAdminTestMessage(err.message)
+          setLoadError(err.message)
+          setBookings([])
           return
         }
-        setAdminTestMessage('Unknown error')
+        setLoadError('Unknown error')
+        setBookings([])
       }
     }
 
@@ -89,11 +107,36 @@ const AdminPage = () => {
             </button>
           </div>
           <div>
-            <div className="testing-panel">
-              <p className="subtext">Testing panel</p>
-              <p className="subtext">{globalContext.state.adminToken}</p>
-              <p className="subtext">{token ? adminTestMessage : 'no admin token'}</p>
-            </div>
+            {loadError ? (
+              <p className="subtext">{loadError}</p>
+            ) : bookings.length === 0 ? (
+              <p className="subtext">No bookings yet.</p>
+            ) : (
+              <table className="admin-bookings">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Room Type</th>
+                    <th>Date</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {bookings.map((booking, index) => (
+                    <tr key={booking.id ?? `${booking.guestEmail ?? 'booking'}-${index}`}>
+                      <td>{booking.id ?? '-'}</td>
+                      <td>{booking.roomTypeId ?? '-'}</td>
+                      <td>{booking.bookingDate ?? '-'}</td>
+                      <td>{booking.guestName ?? '-'}</td>
+                      <td>{booking.guestEmail ?? '-'}</td>
+                      <td>{booking.guestPhone ?? '-'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
       </div>
