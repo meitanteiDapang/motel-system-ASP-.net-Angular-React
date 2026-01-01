@@ -3,19 +3,25 @@ import type { Availability, BookingResult } from '../types'
 
 interface AvailabilityParams {
   roomTypeId: number
-  date: string
+  checkInDate: string
+  checkOutDate: string
 }
 
 interface CreateBookingPayload {
   roomTypeId: number
-  date: string
+  checkInDate: string
+  checkOutDate: string
   name: string
   email: string
   phone: string
 }
 
-export const requestAvailability = async ({ roomTypeId, date }: AvailabilityParams): Promise<Availability> => {
-  const params = new URLSearchParams({ date })
+export const requestAvailability = async ({
+  roomTypeId,
+  checkInDate,
+  checkOutDate,
+}: AvailabilityParams): Promise<Availability> => {
+  const params = new URLSearchParams({ checkInDate, checkOutDate })
   const res = await fetch(apiUrl(`/room-types/${roomTypeId}/availability?${params.toString()}`))
   if (!res.ok) {
     throw new Error(`Failed to check availability (HTTP ${res.status})`)
@@ -25,7 +31,8 @@ export const requestAvailability = async ({ roomTypeId, date }: AvailabilityPara
 
 export const requestCreateBooking = async ({
   roomTypeId,
-  date,
+  checkInDate,
+  checkOutDate,
   name,
   email,
   phone,
@@ -35,7 +42,8 @@ export const requestCreateBooking = async ({
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       roomTypeId,
-      bookingDate: date,
+      checkInDate,
+      checkOutDate,
       guestName: name,
       guestEmail: email,
       guestPhone: phone,
@@ -48,7 +56,7 @@ export const requestCreateBooking = async ({
 
   if (res.status === 409) {
     const data = await res.json().catch(() => null)
-    throw new Error(data?.message || 'This room type is sold out for the selected date.')
+    throw new Error(data?.message || 'This room type is sold out for the selected dates.')
   }
 
   const errorText = await res.text().catch(() => '')

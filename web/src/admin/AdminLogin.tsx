@@ -22,7 +22,11 @@ const AdminLogin = () => {
   const adminLogin = useAdminLogin(username, password)
 
 
-  const verifyToken = async (): Promise<boolean> =>{
+
+
+  useEffect(() => {
+
+      const verifyToken = async (): Promise<boolean> =>{
     if(!token){
       return false
     } else {
@@ -32,7 +36,6 @@ const AdminLogin = () => {
 
   }
 
-  useEffect(() => {
     const run = async () => {
       if (await verifyToken()) {
         navigate('/admin')

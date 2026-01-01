@@ -6,10 +6,6 @@ interface adminLoginResponse {
   token?: string
 }
 
-interface checkAdminToeknResponse {
-  status: boolean,
-  message?: string
-}
 
 
 const isAdminLoginResponse = (value: unknown): value is { message?: string, token?: string } => {
@@ -43,9 +39,9 @@ export const useAdminLogin = (username: string, password: string): UseAdminLogin
       if (!token) {
         return false
       }
-      const data = await requestCheckAdminToken(token)
+      await requestCheckAdminToken(token)
       return true
-    } catch (err) {
+    } catch {
       return false
     }
   }

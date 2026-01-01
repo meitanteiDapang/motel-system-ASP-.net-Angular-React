@@ -1,6 +1,7 @@
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useRoomTypes } from '../hooks/useRoomTypes'
 import type { RoomType } from '../types'
+import './booking.css'
 
 const BookingSuccess = () => {
   const navigate = useNavigate()

@@ -22,13 +22,18 @@ public static class LoadBookingsEndpoints
     {
         var bookings = await db.Bookings
             .AsNoTracking()
-            .OrderByDescending(booking => booking.BookingDate)
+            .OrderByDescending(booking => booking.CheckInDate)
             .ThenByDescending(booking => booking.Id)
             .Select(booking => new
             {
                 booking.Id,
                 booking.RoomTypeId,
-                BookingDate = booking.BookingDate.ToString("yyyy-MM-dd"),
+                CheckInDate = booking.CheckInDate.ToString("yyyy-MM-dd"),
+                CheckOutDate = booking.CheckOutDate.ToString("yyyy-MM-dd"),
+                RoomNumber = db.BookedRooms
+                    .Where(room => room.BookingId == booking.Id)
+                    .Select(room => (int?)room.RoomNumber)
+                    .FirstOrDefault(),
                 booking.GuestName,
                 booking.GuestEmail,
                 booking.GuestPhone

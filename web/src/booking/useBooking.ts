@@ -3,7 +3,8 @@ import { requestAvailability, requestCreateBooking } from './bookingApi'
 import type { Availability } from '../types'
 
 interface BookingForm {
-  date: string
+  checkInDate: string
+  checkOutDate: string
   name: string
   email: string
   phone: string
@@ -23,7 +24,8 @@ interface UseBookingResult {
 
 export const useBooking = (roomTypeId?: number | null): UseBookingResult => {
   const [form, setForm] = useState<BookingForm>({
-    date: '',
+    checkInDate: '',
+    checkOutDate: '',
     name: '',
     email: '',
     phone: '',
@@ -36,9 +38,24 @@ export const useBooking = (roomTypeId?: number | null): UseBookingResult => {
   const [success, setSuccess] = useState('')
 
   useEffect(() => {
-    if (!roomTypeId || !form.date) {
+    if (!roomTypeId || !form.checkInDate || !form.checkOutDate) {
       setAvailability(null)
       setAvailabilityError('')
+      return
+    }
+
+    const checkIn = new Date(form.checkInDate)
+    const checkOut = new Date(form.checkOutDate)
+
+    if (Number.isNaN(checkIn.getTime()) || Number.isNaN(checkOut.getTime())) {
+      setAvailability(null)
+      setAvailabilityError('Please select valid dates.')
+      return
+    }
+
+    if (checkOut <= checkIn) {
+      setAvailability(null)
+      setAvailabilityError('Check-out must be after check-in.')
       return
     }
 
@@ -47,13 +64,18 @@ export const useBooking = (roomTypeId?: number | null): UseBookingResult => {
       setChecking(true)
       setAvailabilityError('')
       try {
-        const data = await requestAvailability({ roomTypeId, date: form.date })
+        const data = await requestAvailability({
+          roomTypeId,
+          checkInDate: form.checkInDate,
+          checkOutDate: form.checkOutDate,
+        })
         if (!controller.signal.aborted) {
           setAvailability(data)
         }
       } catch (err) {
         if (!controller.signal.aborted) {
           const message = err instanceof Error ? err.message : 'Failed to check availability.'
+          setAvailability(null)
           setAvailabilityError(message)
         }
       } finally {
@@ -65,7 +87,7 @@ export const useBooking = (roomTypeId?: number | null): UseBookingResult => {
 
     checkAvailability()
     return () => controller.abort()
-  }, [roomTypeId, form.date])
+  }, [roomTypeId, form.checkInDate, form.checkOutDate])
 
   const setField = <K extends keyof BookingForm>(field: K, value: BookingForm[K]) => {
     setForm((prev) => ({ ...prev, [field]: value }))
@@ -82,8 +104,8 @@ export const useBooking = (roomTypeId?: number | null): UseBookingResult => {
       return null
     }
 
-    if (!form.date || !form.name || !form.email || !form.phone) {
-      setError('Please fill out date, name, email, and phone.')
+    if (!form.checkInDate || !form.checkOutDate || !form.name || !form.email || !form.phone) {
+      setError('Please fill out check-in, check-out, name, email, and phone.')
       return null
     }
 
@@ -93,14 +115,25 @@ export const useBooking = (roomTypeId?: number | null): UseBookingResult => {
       return null
     }
 
-    const chosenDate = new Date(form.date)
-    if (Number.isNaN(chosenDate.getTime()) || chosenDate < today) {
-      setError('Please select a future date.')
+    const checkInDate = new Date(form.checkInDate)
+    const checkOutDate = new Date(form.checkOutDate)
+    if (Number.isNaN(checkInDate.getTime()) || Number.isNaN(checkOutDate.getTime())) {
+      setError('Please select valid dates.')
+      return null
+    }
+
+    if (checkInDate < today) {
+      setError('Please select a future check-in date.')
+      return null
+    }
+
+    if (checkOutDate <= checkInDate) {
+      setError('Check-out must be after check-in.')
       return null
     }
 
     if (availability && !availability.available) {
-      setError('This room type is sold out for the selected date.')
+      setError('This room type is sold out for the selected dates.')
       return null
     }
 
@@ -108,12 +141,14 @@ export const useBooking = (roomTypeId?: number | null): UseBookingResult => {
     try {
       const result = await requestCreateBooking({
         roomTypeId,
-        date: form.date,
+        checkInDate: form.checkInDate,
+        checkOutDate: form.checkOutDate,
         name: form.name,
         email: form.email,
         phone: form.phone,
       })
-      setSuccess('Booking confirmed. We will reach out shortly.')
+      const roomNote = result?.roomNumber ? ` Room #${result.roomNumber} reserved.` : ''
+      setSuccess(`Booking confirmed. We will reach out shortly.${roomNote}`)
       return result?.id ?? null
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to create booking.'

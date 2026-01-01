@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useBooking } from './useBooking'
 import { useRoomTypes } from '../hooks/useRoomTypes'
 import type { RoomType } from '../types'
+import './booking.css'
 
 const sanitizePhone = (raw: string): string => {
   if (!raw) return ''
@@ -25,7 +26,45 @@ const Booking = () => {
 
   const booking = useBooking(selectedRoom?.id)
   const [localError, setLocalError] = useState('')
-  const today = useMemo(() => new Date().toISOString().split('T')[0], [])
+  const today = useMemo(() => {
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = String(now.getMonth() + 1).padStart(2, '0')
+    const day = String(now.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }, [])
+  const minCheckOutDate = useMemo(() => {
+    if (!booking.form.checkInDate) {
+      const tomorrow = new Date()
+      tomorrow.setDate(tomorrow.getDate() + 1)
+      const year = tomorrow.getFullYear()
+      const month = String(tomorrow.getMonth() + 1).padStart(2, '0')
+      const day = String(tomorrow.getDate()).padStart(2, '0')
+      return `${year}-${month}-${day}`
+    }
+    const parsed = new Date(booking.form.checkInDate)
+    if (Number.isNaN(parsed.getTime())) return today
+    parsed.setDate(parsed.getDate() + 1)
+    const year = parsed.getFullYear()
+    const month = String(parsed.getMonth() + 1).padStart(2, '0')
+    const day = String(parsed.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }, [booking.form.checkInDate, today])
+  const totalPrice = useMemo(() => {
+    if (!selectedRoom || !booking.form.checkInDate || !booking.form.checkOutDate) return null
+    const checkIn = new Date(booking.form.checkInDate)
+    const checkOut = new Date(booking.form.checkOutDate)
+    if (Number.isNaN(checkIn.getTime()) || Number.isNaN(checkOut.getTime())) return null
+    if (checkOut <= checkIn) return null
+    const nights = Math.ceil(
+      (checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24),
+    )
+    if (nights <= 0) return null
+    return {
+      nights,
+      total: nights * selectedRoom.price,
+    }
+  }, [booking.form.checkInDate, booking.form.checkOutDate, selectedRoom])
 
   const handleSuccess = useCallback(
     (bookingId: number | null) => {
@@ -55,7 +94,7 @@ const Booking = () => {
           type="button"
           onClick={() => navigate('/')}
         >
-          Back to rooms
+          Back to Home
         </button>
         <div>
           <p className="eyebrow">Booking</p>
@@ -79,27 +118,39 @@ const Booking = () => {
               </div>
               <h2>{selectedRoom.typeName}</h2>
               <p>
-                {selectedRoom.bedNumber} beds · ${selectedRoom.price} ·{' '}
-                {selectedRoom.availableRoomsNumber} rooms
+                {selectedRoom.bedNumber} beds · ${selectedRoom.price}
               </p>
               <p className="subtext">
-                Pick a date and leave your contact details. We will hold the room after
-                booking.
+                Pick your check-in and check-out dates and leave your contact details. We will
+                hold the room after booking.
               </p>
             </div>
 
             <div className="booking-form">
-              <label className="field">
-                <span>Date</span>
-                <input
-                  type="date"
-                  value={booking.form.date}
-                  min={today}
-                  onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                    booking.setField('date', event.target.value)
-                  }
-                />
-              </label>
+              <div className="field-group">
+                <label className="field">
+                  <span>Check-in</span>
+                  <input
+                    type="date"
+                    value={booking.form.checkInDate}
+                    min={today}
+                    onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                      booking.setField('checkInDate', event.target.value)
+                    }
+                  />
+                </label>
+                <label className="field">
+                  <span>Check-out</span>
+                  <input
+                    type="date"
+                    value={booking.form.checkOutDate}
+                    min={minCheckOutDate}
+                    onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                      booking.setField('checkOutDate', event.target.value)
+                    }
+                  />
+                </label>
+              </div>
               <label className="field">
                 <span>Name</span>
                 <input
@@ -132,12 +183,21 @@ const Booking = () => {
                   onChange={(event: ChangeEvent<HTMLInputElement>) =>
                     booking.setField('phone', sanitizePhone(event.target.value))
                   }
-                  placeholder="+64 9 555 4321"
+                  placeholder="11 111 1111"
                 />
               </label>
 
+              {totalPrice && (
+                <p className="subtext total-price">
+                  Total: ${totalPrice.total} ({totalPrice.nights} night
+                  {totalPrice.nights === 1 ? '' : 's'})
+                </p>
+              )}
+
               <div className="availability">
-                {!booking.form.date && <span>Select a date to check availability.</span>}
+                {(!booking.form.checkInDate || !booking.form.checkOutDate) && (
+                  <span>Select check-in and check-out dates to check availability.</span>
+                )}
                 {booking.checking && <span>Checking availability...</span>}
                 {booking.availabilityError && (
                   <span className="error-text">{booking.availabilityError}</span>
@@ -150,7 +210,7 @@ const Booking = () => {
                   >
                     {booking.availability.available
                       ? `${booking.availability.remaining} rooms left`
-                      : 'Sold out for this date.'}
+                      : 'Sold out for these dates.'}
                   </span>
                 )}
               </div>
@@ -165,7 +225,9 @@ const Booking = () => {
                 disabled={
                   booking.submitting ||
                   booking.checking ||
-                  (booking.availability && !booking.availability.available)
+                  !booking.form.checkInDate ||
+                  !booking.form.checkOutDate ||
+                  booking.availability?.available === false
                 }
               >
                 {booking.submitting ? 'Booking...' : 'Confirm booking'}

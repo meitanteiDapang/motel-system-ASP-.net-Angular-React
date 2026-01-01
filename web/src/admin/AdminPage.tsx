@@ -8,7 +8,9 @@ import { apiUrl } from '../apiClient'
 type AdminBooking = {
   id?: number
   roomTypeId?: number
-  bookingDate?: string
+  roomNumber?: number
+  checkInDate?: string
+  checkOutDate?: string
   guestName?: string
   guestEmail?: string
   guestPhone?: string
@@ -117,7 +119,9 @@ const AdminPage = () => {
                   <tr>
                     <th>ID</th>
                     <th>Room Type</th>
-                    <th>Date</th>
+                    <th>Room #</th>
+                    <th>Check-in</th>
+                    <th>Check-out</th>
                     <th>Name</th>
                     <th>Email</th>
                     <th>Phone</th>
@@ -128,7 +132,9 @@ const AdminPage = () => {
                     <tr key={booking.id ?? `${booking.guestEmail ?? 'booking'}-${index}`}>
                       <td>{booking.id ?? '-'}</td>
                       <td>{booking.roomTypeId ?? '-'}</td>
-                      <td>{booking.bookingDate ?? '-'}</td>
+                      <td>{booking.roomNumber ?? '-'}</td>
+                      <td>{booking.checkInDate ?? '-'}</td>
+                      <td>{booking.checkOutDate ?? '-'}</td>
                       <td>{booking.guestName ?? '-'}</td>
                       <td>{booking.guestEmail ?? '-'}</td>
                       <td>{booking.guestPhone ?? '-'}</td>

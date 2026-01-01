@@ -14,6 +14,7 @@ export interface Availability {
 
 export interface BookingResult {
   id?: number
+  roomNumber?: number
 }
 
 export interface TestProbeResponse {
