@@ -1,8 +1,4 @@
-import { useNavigate } from "react-router-dom";
-
-const AdminPage = () => {
-  const navigate = useNavigate();
-
+const AdminPage = ({ onBack, onSwitch }) => {
   return (
     <div className="page bright admin-page">
       <div className="glow glow-one" />
@@ -17,22 +13,10 @@ const AdminPage = () => {
             </p>
           </div>
           <div className="admin-actions">
-            <button
-              className="book-btn"
-              type="button"
-              onClick={() => {
-                navigate("/");
-              }}
-            >
+            <button className="book-btn" type="button" onClick={onBack}>
               Back to homepage
             </button>
-            <button
-              className="ghost-btn"
-              type="button"
-              onClick={() => {
-                navigate("/login");
-              }}
-            >
+            <button className="ghost-btn" type="button" onClick={onSwitch}>
               Switch account
             </button>
           </div>
