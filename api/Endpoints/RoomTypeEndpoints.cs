@@ -16,7 +16,7 @@ public static class RoomTypeEndpoints
 
     private static async Task<IResult> GetRoomTypes(
     AppDbContext db,
-    int test_number = 3,
+    int test_number = 0,
     CancellationToken cancellationToken = default)
     {
         var roomTypes = await db.RoomTypes
