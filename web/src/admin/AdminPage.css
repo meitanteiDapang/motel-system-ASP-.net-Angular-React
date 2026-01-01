@@ -10,11 +10,34 @@
   align-content: start;
 }
 
+.admin-header {
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.admin-header h1 {
+  margin: 0 0 6px;
+  font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+  letter-spacing: 0.02em;
+  color: #14213d;
+}
+
+.admin-header .subtext {
+  margin: 0;
+  color: #566173;
+}
+
 .admin-topbar {
   display: flex;
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 16px;
+}
+
+.admin-secondary-row {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 18px;
 }
 
 .admin-flat-btn {
@@ -29,6 +52,16 @@
   transform: none;
   box-shadow: none;
   background: #e8ecf4;
+}
+
+.admin-flat-btn.admin-toggle-btn {
+  background: #860cd2;
+  color: #f8fafc;
+  border-color: rgba(11, 107, 203, 0.5);
+}
+
+.admin-flat-btn.admin-toggle-btn:hover {
+  background: #cf0cd2;
 }
 
 .testing-panel {
@@ -70,6 +103,76 @@
   padding: 14px 16px;
   border-top: 1px solid rgba(15, 22, 38, 0.08);
   color: #1e2636;
+}
+
+.admin-action-cell {
+  position: relative;
+}
+
+.admin-action-menu {
+  position: relative;
+  display: inline-block;
+}
+
+.admin-action-trigger {
+  list-style: none;
+  cursor: pointer;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 22, 38, 0.2);
+  background: #ffffff;
+  color: #1e2636;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-action-trigger::-webkit-details-marker {
+  display: none;
+}
+
+.admin-action-trigger::after {
+  content: "";
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid #1e2636;
+}
+
+.admin-action-menu[open] .admin-action-trigger {
+  border-color: rgba(15, 22, 38, 0.4);
+  box-shadow: 0 8px 20px rgba(15, 22, 38, 0.12);
+}
+
+.admin-action-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 140px;
+  background: #ffffff;
+  border: 1px solid rgba(15, 22, 38, 0.12);
+  border-radius: 14px;
+  box-shadow: 0 12px 30px rgba(15, 22, 38, 0.15);
+  padding: 8px;
+  z-index: 10;
+}
+
+.admin-action-item {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-weight: 600;
+  color: #1e2636;
+  cursor: pointer;
+}
+
+.admin-action-item:hover {
+  background: rgba(15, 22, 38, 0.06);
 }
 
 .admin-bookings tbody tr:nth-child(even) {

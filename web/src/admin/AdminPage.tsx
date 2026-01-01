@@ -21,6 +21,7 @@ const AdminPage = () => {
   const globalContext = useGlobalContext()
   const [bookings, setBookings] = useState<AdminBooking[]>([])
   const [loadError, setLoadError] = useState<string | null>(null)
+  const [showFutureOnly, setShowFutureOnly] = useState(true)
   const token = globalContext.state.adminToken
 
 
@@ -40,7 +41,8 @@ const AdminPage = () => {
     let isActive = true
     const load = async () => {
       try {
-        const res = await fetch(apiUrl('/admin/loadBookings'), {
+        const scope = showFutureOnly ? 'future' : 'all'
+        const res = await fetch(apiUrl(`/admin/loadBookings?scope=${scope}`), {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -80,7 +82,7 @@ const AdminPage = () => {
     return () => {
       isActive = false
     }
-  }, [token])
+  }, [token, showFutureOnly])
 
 
   const formatRoomLabel = (roomTypeId?: number, roomNumber?: number) => {
@@ -102,6 +104,9 @@ const AdminPage = () => {
       <div className="glow glow-two" />
       <div className="auth-shell">
         <div className="auth-card">
+          <div className="admin-header">
+            <h1>Admin Dashboard</h1>
+          </div>
           <div className="admin-topbar">
             <button
               className="book-btn admin-flat-btn"
@@ -112,13 +117,21 @@ const AdminPage = () => {
             >
               Back to home
             </button>
-            <p>
-              Admin Dashboard
-            </p>
             <button className="book-btn admin-flat-btn"
              type="button"
              onClick={logout}>
               Logout
+            </button>
+          </div>
+          <div className="admin-secondary-row">
+            <button
+              className="book-btn admin-flat-btn admin-toggle-btn"
+              type="button"
+              onClick={() => {
+                setShowFutureOnly((prev) => !prev)
+              }}
+            >
+              {showFutureOnly ? 'Show all' : 'Show future'}
             </button>
           </div>
           <div>
@@ -137,6 +150,7 @@ const AdminPage = () => {
                     <th>Name</th>
                     <th>Email</th>
                     <th>Phone</th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -149,6 +163,26 @@ const AdminPage = () => {
                       <td>{booking.guestName ?? '-'}</td>
                       <td>{booking.guestEmail ?? '-'}</td>
                       <td>{booking.guestPhone ?? '-'}</td>
+                      <td className="admin-action-cell">
+                        <details className="admin-action-menu">
+                          <summary className="admin-action-trigger"></summary>
+                          <div className="admin-action-dropdown">
+                            <button
+                              className="admin-action-item"
+                              type="button"
+                              onClick={(event) => {
+                                console.log('delete booking id:', booking.id ?? '-')
+                                const details = event.currentTarget.closest('details')
+                                if (details) {
+                                  details.removeAttribute('open')
+                                }
+                              }}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </details>
+                      </td>
                     </tr>
                   ))}
                 </tbody>

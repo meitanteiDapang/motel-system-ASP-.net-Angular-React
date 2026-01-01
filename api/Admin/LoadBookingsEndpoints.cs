@@ -17,13 +17,30 @@ public static class LoadBookingsEndpoints
 
     private static async Task<IResult> GetLoadBookings(
         AppDbContext db,
+        string? scope,
         CancellationToken cancellationToken = default
     )
     {
-        var bookings = await db.Bookings
-            .AsNoTracking()
-            .OrderByDescending(booking => booking.CheckInDate)
-            .ThenByDescending(booking => booking.Id)
+        TimeZoneInfo nzTimeZone;
+        try
+        {
+            nzTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Pacific/Auckland");
+        }
+        catch (TimeZoneNotFoundException)
+        {
+            nzTimeZone = TimeZoneInfo.FindSystemTimeZoneById("New Zealand Standard Time");
+        }
+
+        var today = DateOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, nzTimeZone));
+        var query = db.Bookings.AsNoTracking();
+        if (string.Equals(scope, "future", StringComparison.OrdinalIgnoreCase))
+        {
+            query = query.Where(booking => booking.CheckInDate >= today);
+        }
+
+        var bookings = await query
+            .OrderBy(booking => booking.CheckInDate)
+            .ThenBy(booking => booking.Id)
             .Select(booking => new
             {
                 booking.Id,
