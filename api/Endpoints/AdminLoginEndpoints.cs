@@ -34,24 +34,28 @@ public static class AdminLoginEndpoints
                     statusCode: StatusCodes.Status401Unauthorized);
         }
 
+        var jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET") ?? "abcdefghijklmnopqrstuvwxyzdapangpp";
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret));
+        var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-        var secret = Environment.GetEnvironmentVariable("JWT_SECRET") ?? "abcdefghijklmnopqrstuvwxyzdapangpp";
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
-        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        var claims = new[]
+        {
+            new Claim(ClaimTypes.Name, requestUsername),
+            new Claim(ClaimTypes.Role, "admin"),
+        };
 
-        var token = new JwtSecurityToken(
-            issuer: "ecommerce-api",
-            audience: "ecommerce-admin",
-            claims: new[]
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, requestUsername),
-                new Claim(ClaimTypes.Role, "admin")
-            },
-            notBefore: DateTime.UtcNow,
-            expires: DateTime.UtcNow.AddHours(100),
-            signingCredentials: credentials);
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(claims),
+            Expires = DateTime.UtcNow.AddHours(1),
+            Issuer = "ecommerce-api",
+            Audience = "ecommerce-admin",
+            SigningCredentials = signingCredentials
+        };
 
-        var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        var jwt = tokenHandler.WriteToken(token);
 
         return Results.Ok(new
         {
