@@ -1,7 +1,19 @@
 import { useNavigate } from 'react-router-dom'
+import { useGlobalContext } from '../context/globalContext'
+import './AdminShared.css'
+import './AdminPage.css'
+import { useEffect } from 'react'
+
 
 const AdminPage = () => {
   const navigate = useNavigate()
+  const globalContext = useGlobalContext()
+
+
+  useEffect(()=>{
+    
+  })
+
 
   return (
     <div className="page bright admin-page">
@@ -9,32 +21,28 @@ const AdminPage = () => {
       <div className="glow glow-two" />
       <div className="auth-shell">
         <div className="auth-card">
-          <div>
-            <p className="eyebrow">Admin console</p>
-            <h2>Welcome, operator</h2>
-            <p className="subtext">
-              Dashboard wiring goes here. For now, you are signed in.
-            </p>
-          </div>
-          <div className="admin-actions">
+          <div className="admin-topbar">
             <button
-              className="book-btn"
+              className="book-btn admin-flat-btn"
               type="button"
               onClick={() => {
                 navigate('/')
               }}
             >
-              Back to homepage
+              Back to home
             </button>
-            <button
-              className="ghost-btn"
-              type="button"
-              onClick={() => {
-                navigate('/login')
-              }}
-            >
-              Switch account
+            <p>
+              Admin Dashboard
+            </p>
+            <button className="book-btn admin-flat-btn" type="button">
+              Logout
             </button>
+          </div>
+          <div>
+            <div className="testing-panel">
+              <p className="subtext">Testing panel</p>
+              <p className="subtext">{globalContext.state.adminToken}</p>
+            </div>
           </div>
         </div>
       </div>

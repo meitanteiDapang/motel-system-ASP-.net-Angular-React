@@ -1,0 +1,41 @@
+.admin-page .auth-shell {
+  min-height: calc(100vh - 140px);
+  align-items: stretch;
+  padding: clamp(16px, 3vw, 32px);
+}
+
+.admin-page .auth-card {
+  width: min(1200px, 100%);
+  min-height: calc(100vh - 220px);
+  align-content: start;
+}
+
+.admin-topbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.admin-flat-btn {
+  border-radius: 12px;
+  box-shadow: none;
+  background: #f2f4f8;
+  color: #0f1626;
+  border: 1px solid rgba(15, 22, 38, 0.12);
+}
+
+.admin-flat-btn:hover {
+  transform: none;
+  box-shadow: none;
+  background: #e8ecf4;
+}
+
+.testing-panel {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(15, 22, 38, 0.05);
+  border: 1px solid rgba(15, 22, 38, 0.08);
+  word-break: break-all;
+}

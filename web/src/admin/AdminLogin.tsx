@@ -1,12 +1,20 @@
 import { useNavigate } from 'react-router-dom'
 import { useState, type ChangeEvent, type FormEvent } from 'react'
 import { useAdminLogin } from './useAdminLogin'
+import { useGlobalContext } from '../context/globalContext'
+import './AdminShared.css'
+
+
+
+
 
 const AdminLogin = () => {
   const navigate = useNavigate()
   const [username, setUsername] = useState<string>('admin')
   const [password, setPassword] = useState<string>('ps^word')
   const [errorText, setErrorText] = useState<string>('')
+  const { globalDispatch } = useGlobalContext()
+
 
   const adminLogin = useAdminLogin(username, password)
 
@@ -14,6 +22,14 @@ const AdminLogin = () => {
     event.preventDefault()
     const res = await adminLogin.submit()
     if (res.success) {
+      if (res.token){
+        globalDispatch({ type: 'setAdminToken', token: res.token })
+      } else {
+        setErrorText('Token fetch failed, please try again later.')
+        return
+      }
+
+
       navigate('/admin')
     } else {
       setErrorText(res.message ?? 'Unknown error')

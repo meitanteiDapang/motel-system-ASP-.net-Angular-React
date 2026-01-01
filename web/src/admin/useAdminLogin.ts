@@ -21,7 +21,7 @@ export const useAdminLogin = (username: string, password: string): UseAdminLogin
       if (!isAdminLoginResponse(res)) {
         return {success: false, message: 'Unknown error, please try again!'}
       }
-      return {success: true}
+      return {success: true, token: res.token}
     } catch (err) {
       if (err instanceof Error) {
         return {success: false, message: err.message}
