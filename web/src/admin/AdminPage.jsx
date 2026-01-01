@@ -30,7 +30,7 @@ const AdminPage = () => {
               className="ghost-btn"
               type="button"
               onClick={() => {
-                navigate("/login");
+                navigate("/adminlogin");
               }}
             >
               Switch account
