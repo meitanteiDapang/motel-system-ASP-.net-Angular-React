@@ -12,11 +12,14 @@
 
 .admin-header {
   margin-bottom: 16px;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
 }
 
 .admin-header h1 {
-  margin: 0 0 6px;
+  margin: 0;
   font-size: clamp(1.6rem, 2.5vw, 2.2rem);
   letter-spacing: 0.02em;
   color: #14213d;
@@ -27,11 +30,50 @@
   color: #566173;
 }
 
+.admin-header-actions {
+  display: inline-flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .admin-topbar {
   display: flex;
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 16px;
+}
+
+.admin-tabs {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0 14px;
+}
+
+.admin-tab-btn {
+  border: 1px solid rgba(15, 22, 38, 0.12);
+  background: #f7f9fc;
+  color: #0f1626;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.admin-tab-btn:hover {
+  background: #eef2f8;
+  box-shadow: 0 6px 16px rgba(15, 22, 38, 0.08);
+}
+
+.admin-tab-btn.is-active {
+  background: linear-gradient(135deg, #14213d, #1f2f52);
+  color: #f8fafc;
+  border-color: rgba(20, 33, 61, 0.5);
+  box-shadow: 0 8px 18px rgba(20, 33, 61, 0.25);
+}
+
+.admin-tab-panel {
+  width: 100%;
 }
 
 .admin-secondary-row {
