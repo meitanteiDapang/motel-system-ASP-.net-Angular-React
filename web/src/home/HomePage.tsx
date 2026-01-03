@@ -1,8 +1,9 @@
-import type { MouseEvent } from "react";
+import type { JSX, MouseEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRoomTypes } from "../hooks/useRoomTypes";
 import { useTestProbe } from "../hooks/useTestProbe";
 import type { RoomType } from "../types";
+import "./home.css";
 
 const HomePage = () => {
   const navigate = useNavigate();

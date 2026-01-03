@@ -42,3 +42,18 @@
   flex-wrap: wrap;
   gap: 12px;
 }
+
+.admin-flat-btn {
+  border-radius: 12px;
+  box-shadow: none;
+  background: #f2f4f8;
+  color: #0f1626;
+  border: 1px solid rgba(15, 22, 38, 0.12);
+  cursor: pointer;
+}
+
+.admin-flat-btn:hover {
+  transform: none;
+  box-shadow: none;
+  background: #e8ecf4;
+}

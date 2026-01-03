@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, JSX } from 'react'
 import { useGlobalContext } from '../context/globalContext'
 import { apiUrl } from '../apiClient'
 import type { AdminBooking } from './AdminPage'
+import './bookingsTable.css'
 
 // Present room identity even when one of the pieces is missing.
 const formatRoomLabel = (roomTypeId?: number, roomNumber?: number) => {
