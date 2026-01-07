@@ -10,7 +10,7 @@ This is a demo for a motel system, covering both customer and admin experiences.
 
 ## File Structure
 - `front/`: Angular UI
-- `web/`: React UI 
+- `web/`: React UI (partial)
 - `api/`: ASP.NET Core API
 - `sql/`: Schema and seed SQL
 - `scripts/`: Helper scripts for dev and ops
