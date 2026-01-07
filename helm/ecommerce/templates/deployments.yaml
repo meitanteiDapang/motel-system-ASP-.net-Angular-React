@@ -1,3 +1,27 @@
+{{- $uiTarget := .Values.ui.target | default "front" }}
+{{- if eq $uiTarget "front" }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-front
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-front
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-front
+    spec:
+      containers:
+        - name: front
+          image: "{{ .Values.front.image.repository }}:{{ .Values.front.image.tag }}"
+          imagePullPolicy: {{ .Values.front.image.pullPolicy | default "IfNotPresent" }}
+          ports:
+            - containerPort: 80
+{{- else if eq $uiTarget "web" }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -19,6 +43,7 @@ spec:
           imagePullPolicy: {{ .Values.web.image.pullPolicy | default "IfNotPresent" }}
           ports:
             - containerPort: 80
+{{- end }}
 
 ---
 apiVersion: apps/v1

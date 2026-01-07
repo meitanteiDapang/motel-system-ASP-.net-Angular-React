@@ -1,0 +1,40 @@
+<div class="page bright admin-page">
+  <div class="glow glow-one"></div>
+  <div class="glow glow-two"></div>
+  <div class="auth-shell">
+    <div class="auth-card">
+      <div>
+        <p class="eyebrow">Admin access</p>
+        <h2>Sign in to manage Dapang motel</h2>
+        <p class="subtext">
+          Enter your credentials to reach the admin console.
+        </p>
+        <p class="subtext error-text" *ngIf="errorText">
+          {{ errorText }}
+        </p>
+      </div>
+      <form class="auth-form" [formGroup]="form" (ngSubmit)="handleSubmit()">
+        <label class="field">
+          Username
+          <input
+            type="text"
+            formControlName="username"
+          />
+        </label>
+        <label class="field">
+          Password
+          <input
+            type="password"
+            formControlName="password"
+          />
+        </label>
+        <button class="book-btn primary" type="submit">
+          {{ submitting ? 'Entering...' : 'Enter admin' }}
+        </button>
+        <button class="ghost-btn" type="button" (click)="handleBack()">
+          Back to homepage
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

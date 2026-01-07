@@ -1,0 +1,19 @@
+<div class="booking-page">
+  <div class="booking-header">
+    <button class="back-btn" type="button" (click)="navigateHome()">
+      Back to home
+    </button>
+    <div>
+      <p class="eyebrow">Booking</p>
+      <h1>Booking confirmed</h1>
+    </div>
+  </div>
+
+  <div class="booking-card booking-success">
+    <h2>Your reservation is locked in.</h2>
+    <p class="subtext">{{ confirmationCopy }}</p>
+    <button class="book-btn primary" type="button" (click)="navigateHome()">
+      Back to homepage
+    </button>
+  </div>
+</div>

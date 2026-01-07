@@ -1,4 +1,6 @@
 {{- if .Values.ingress.enabled }}
+{{- $uiTarget := .Values.ui.target | default "front" }}
+{{- $uiService := ternary (printf "%s-front" .Release.Name) (printf "%s-web" .Release.Name) (eq $uiTarget "front") }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -29,7 +31,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ .Release.Name }}-web
+                name: {{ $uiService }}
                 port:
                   number: 80
     {{- end }}
@@ -40,7 +42,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ .Release.Name }}-web
+                name: {{ $uiService }}
                 port:
                   number: 80
 ---

@@ -1,0 +1,134 @@
+<div class="page bright">
+  <div class="glow glow-one"></div>
+  <div class="glow glow-two"></div>
+
+  <header class="hero hero-bright">
+    <div class="nav">
+      <div class="logo">Dapang motel</div>
+      <div class="nav-actions">
+        <span class="pill">Check-in 24/7 · Ocean breeze</span>
+        <button class="admin-link" type="button" (click)="handleAdminEntry($event)">
+          Admin entry
+        </button>
+      </div>
+    </div>
+
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow">Boutique cat motel</p>
+        <h1>
+          A happy hotel created by <span>Dapang</span>,
+          resident king of naps and neon.
+        </h1>
+        <p class="lede">
+          Enjoy a warm, comfortable stay with friendly service and cozy rooms. Relax, recharge, and feel at home during
+          your visit.
+        </p>
+        <div class="meta meta-bright">
+          <div>
+            <strong>9.9</strong> Guest rating
+          </div>
+          <div>
+            <strong>12</strong> Suites blessed by Dapang
+          </div>
+          <div>
+            <strong>08</strong> Steps to sunrise walk
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-card hero-card-bright">
+        <div class="frame-inner">
+          <ng-container *ngIf="heroImage(); else heroFallback">
+            <img [src]="heroImage()" alt="Featured room" class="frame-img" />
+          </ng-container>
+          <ng-template #heroFallback>
+            <div class="frame-img frame-fallback">Loading room...</div>
+          </ng-template>
+          <div class="frame-overlay">
+            <div class="frame-text">After-dark patrols</div>
+            <div class="frame-stats">
+              <span>Neon lamps</span>
+              <span>Ocean hush</span>
+              <span>Soft paws</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section class="section highlights">
+    <div class="section-header">
+      <p class="eyebrow">Dapang manifesto</p>
+      <h2>Book your stay now!</h2>
+    </div>
+    <p class="subtext" *ngIf="roomTypesState().loading">Loading room types...</p>
+    <p class="subtext error-text" *ngIf="roomTypesState().error">
+      Failed to load room types: {{ roomTypesState().error }}
+    </p>
+    <div class="grid three" *ngIf="!roomTypesState().loading && !roomTypesState().error">
+      <div class="highlight-card bright-card" *ngFor="let room of roomTypesState().data | slice:0:4">
+        <div class="img-wrap">
+          <img [src]="room.imageUrl" [alt]="room.typeName" />
+        </div>
+        <h3>{{ room.typeName }}</h3>
+        <p>
+          {{ room.bedNumber }} beds · ${{ room.price }}
+        </p>
+        <div class="card-actions">
+          <button class="book-btn" type="button" (click)="handleBook(room.id)">
+            Book
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section contact contact-bright">
+    <div class="contact-card">
+      <div>
+        <p class="eyebrow">Location</p>
+        <h2>Dapang motel · 711 Dapang Road, Dapang City</h2>
+      </div>
+      <div class="contact-meta">
+        <div>
+          <p class="label">Phone</p>
+          <p class="value">+64 11 111 1111</p>
+        </div>
+        <div>
+          <p class="label">Email</p>
+          <p class="value">dapang@dapangmotel.com</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="booking-test">
+    <div class="test-card">
+      <div>
+        <p class="eyebrow">API probe</p>
+        <h2>Live test ping</h2>
+        <p class="subtext">
+          We call the backend test endpoint and surface its reply.
+        </p>
+      </div>
+      <div class="test-result">
+        <ng-container *ngIf="testProbeState().loading">
+          <span class="pill">Contacting API...</span>
+        </ng-container>
+        <ng-container *ngIf="!testProbeState().loading">
+          <span class="pill error-pill" *ngIf="testProbeState().error">
+            Failed: {{ testProbeState().error }}
+          </span>
+          <div class="pill success-pill" *ngIf="testProbeState().data && !testProbeState().error">
+            <div>{{ testProbeState().data?.message }}</div>
+            <div class="pill-subtext" *ngIf="testProbeState().data?.timestamp">
+              {{ testProbeState().data?.timestamp | date: 'short' }}
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>

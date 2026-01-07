@@ -1,0 +1,77 @@
+<ng-container *ngIf="token">
+  <div class="admin-secondary-row">
+    <button
+      class="book-btn admin-flat-btn admin-toggle-btn"
+      type="button"
+      (click)="toggleScope()"
+    >
+      {{ toggleLabel }}
+    </button>
+  </div>
+
+  <div>
+    <p class="subtext" *ngIf="loadError">{{ loadError }}</p>
+    <p class="subtext" *ngIf="!loadError && bookings.length === 0">No bookings yet.</p>
+    <table class="admin-bookings" *ngIf="!loadError && bookings.length > 0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Room</th>
+          <th>Check-in</th>
+          <th>Check-out</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let booking of bookings">
+          <td>{{ booking.id ?? '-' }}</td>
+          <td>{{ formatRoomLabel(booking.roomTypeId, booking.roomNumber) }}</td>
+          <td>{{ booking.checkInDate ?? '-' }}</td>
+          <td>{{ booking.checkOutDate ?? '-' }}</td>
+          <td>{{ booking.guestName ?? '-' }}</td>
+          <td>{{ booking.guestEmail ?? '-' }}</td>
+          <td>{{ booking.guestPhone ?? '-' }}</td>
+          <td class="admin-action-cell">
+            <details class="admin-action-menu" #menu>
+              <summary class="admin-action-trigger"></summary>
+              <div class="admin-action-dropdown">
+                <button
+                  class="admin-action-item"
+                  type="button"
+                  (click)="onDelete(booking, menu)"
+                >
+                  Delete
+                </button>
+              </div>
+            </details>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="admin-pagination">
+    <button
+      class="book-btn admin-flat-btn"
+      type="button"
+      [disabled]="page() === 1"
+      (click)="previousPage()"
+    >
+      Previous
+    </button>
+    <span class="admin-page-info">
+      Page {{ page() }}{{ pageCount != null ? (' / ' + pageCount) : '' }}
+    </span>
+    <button
+      class="book-btn admin-flat-btn"
+      type="button"
+      [disabled]="isNextDisabled"
+      (click)="nextPage()"
+    >
+      Next
+    </button>
+  </div>
+</ng-container>

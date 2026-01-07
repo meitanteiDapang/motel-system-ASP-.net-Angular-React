@@ -1,3 +1,13 @@
+ui:
+  target: front
+
+front:
+  servicePort: 80
+  image:
+    repository: acrecommercedev629.azurecr.io/front
+    tag: dev-latest
+    pullPolicy: IfNotPresent
+
 web:
   servicePort: 80
   image:

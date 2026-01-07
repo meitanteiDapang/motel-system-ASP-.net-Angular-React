@@ -1,0 +1,39 @@
+<ng-container *ngIf="token">
+  <p class="subtext" *ngIf="loadError">{{ loadError }}</p>
+  <p class="subtext" *ngIf="!loadError && (rooms.length === 0 || days.length === 0)">
+    No bookings yet.
+  </p>
+
+  <div class="admin-timeline" *ngIf="!loadError && rooms.length > 0 && days.length > 0">
+    <div class="admin-timeline-scroll" #scrollContainer>
+      <table class="admin-timeline-table">
+        <thead>
+          <tr>
+            <th class="timeline-room-col">Room</th>
+            <th
+              *ngFor="let day of days"
+              class="timeline-date-col"
+              [attr.data-date]="toDateKey(day)"
+              [attr.data-yesterday]="toDateKey(day) === yesterdayKey ? 'true' : null"
+              #yesterdayHeader
+            >
+              {{ toDateKey(day) }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let room of rooms">
+            <td class="timeline-room-col">{{ room }}</td>
+            <td
+              *ngFor="let day of days"
+              class="timeline-cell"
+              [ngStyle]="getCellStyle(getBooking(room, day))"
+            >
+              {{ getBooking(room, day)?.guestName ?? '' }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</ng-container>

@@ -1,0 +1,101 @@
+<div class="booking-page">
+  <div class="booking-header">
+    <button class="back-btn" type="button" (click)="navigateHome()">
+      Back to Home
+    </button>
+    <div>
+      <p class="eyebrow">Booking</p>
+      <h1>Reserve your stay</h1>
+    </div>
+  </div>
+
+  <div class="booking-card">
+    <p class="subtext" *ngIf="roomTypesState().loading">Loading room details...</p>
+    <p class="subtext error-text" *ngIf="roomTypesState().error">
+      Failed to load room details: {{ roomTypesState().error }}
+    </p>
+    <p class="subtext" *ngIf="!roomTypesState().loading && !roomTypesState().error && !selectedRoom()">
+      Room type not found. Please go back and try again.
+    </p>
+
+    <div class="booking-grid" *ngIf="!roomTypesState().loading && !roomTypesState().error && selectedRoom()">
+      <div class="booking-summary">
+        <div class="img-wrap square">
+          <img [src]="selectedRoom()?.imageUrl" [alt]="selectedRoom()?.typeName ?? 'Selected room'" />
+        </div>
+        <h2>{{ selectedRoom()?.typeName }}</h2>
+        <p>
+          {{ selectedRoom()?.bedNumber }} beds · ${{ selectedRoom()?.price }}
+        </p>
+        <p class="subtext">
+          Pick your check-in and check-out dates and leave your contact details. We will hold the room after booking.
+        </p>
+      </div>
+
+      <form class="booking-form" [formGroup]="bookingForm" (ngSubmit)="handleSubmit()" novalidate>
+        <div class="field-group">
+          <label class="field">
+            <span>Check-in</span>
+            <input type="date" formControlName="checkInDate" [min]="today" />
+          </label>
+          <label class="field">
+            <span>Check-out</span>
+            <input type="date" formControlName="checkOutDate" [min]="minCheckOutDate" />
+          </label>
+        </div>
+        <label class="field">
+          <span>Name</span>
+          <input
+            type="text"
+            formControlName="name"
+            placeholder="Your full name"
+          />
+        </label>
+        <label class="field">
+          <span>Email</span>
+          <input
+            type="email"
+            formControlName="email"
+            placeholder="you@example.com"
+          />
+        </label>
+        <label class="field">
+          <span>Phone</span>
+          <input
+            type="tel"
+            formControlName="phone"
+            inputMode="tel"
+            pattern="[+0-9]*"
+            (input)="onPhoneInput($event)"
+            placeholder="11 111 1111"
+          />
+        </label>
+
+        <p class="subtext total-price" *ngIf="totalPrice">
+          Total: ${{ totalPrice.total }} ({{ totalPrice.nights }} night{{ totalPrice.nights === 1 ? '' : 's' }})
+        </p>
+
+        <div class="availability">
+          <span *ngIf="!bookingForm.value.checkInDate || !bookingForm.value.checkOutDate">
+            Select check-in and check-out dates to check availability.
+          </span>
+          <span *ngIf="checking">Checking availability...</span>
+          <span class="error-text" *ngIf="availabilityError">{{ availabilityError }}</span>
+          <span
+            *ngIf="availability && !checking && !availabilityError"
+            [ngClass]="availability.available ? 'availability-ok' : 'availability-bad'"
+          >
+            {{ availability.available ? (availability.remaining + ' rooms left') : 'Sold out for these dates.' }}
+          </span>
+        </div>
+
+        <p class="subtext error-text" *ngIf="error">{{ error }}</p>
+        <p class="subtext success-text" *ngIf="success">{{ success }}</p>
+
+        <button class="book-btn primary" type="submit" [disabled]="bookingButtonDisabled">
+          {{ submitting ? 'Booking...' : 'Confirm booking' }}
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

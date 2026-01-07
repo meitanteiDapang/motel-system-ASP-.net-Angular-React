@@ -1,0 +1,52 @@
+<div class="page bright admin-page">
+  <div class="glow glow-one"></div>
+  <div class="glow glow-two"></div>
+  <div class="auth-shell">
+    <div class="auth-card">
+      <div class="admin-header">
+        <h1>Admin Dashboard</h1>
+        <div class="admin-header-actions">
+          <button
+            class="book-btn admin-flat-btn"
+            type="button"
+            (click)="goHome()"
+          >
+            Back to home
+          </button>
+          <button
+            class="book-btn admin-flat-btn"
+            type="button"
+            (click)="logout()"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+
+      <ng-container *ngIf="token">
+        <div class="admin-tabs">
+          <button
+            type="button"
+            class="admin-tab-btn"
+            [class.is-active]="activeTab() === 'table'"
+            (click)="setActiveTab('table')"
+          >
+            Bookings Table
+          </button>
+          <button
+            type="button"
+            class="admin-tab-btn"
+            [class.is-active]="activeTab() === 'timeline'"
+            (click)="setActiveTab('timeline')"
+          >
+            Bookings Timeline
+          </button>
+        </div>
+        <div class="admin-tab-panel">
+          <app-bookings-table *ngIf="activeTab() === 'table'"></app-bookings-table>
+          <app-bookings-timeline *ngIf="activeTab() === 'timeline'"></app-bookings-timeline>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>
