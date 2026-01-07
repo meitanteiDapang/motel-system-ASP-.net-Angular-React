@@ -1,7 +1,7 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { catchError, EMPTY, tap } from 'rxjs';
-import { ApiClientService } from './api-client.service';
+import { ApiClientService } from './apiClientService';
 import { TestProbeResponse } from './types';
 
 interface TestProbeState {

@@ -1,0 +1,43 @@
+<div class="hero-grid">
+  <div class="hero-copy">
+    <p class="eyebrow">Boutique cat motel</p>
+    <h1>
+      A happy hotel created by <span>Dapang</span>,
+      resident king of naps and neon.
+    </h1>
+    <p class="lede">
+      Enjoy a warm, comfortable stay with friendly service and cozy rooms. Relax, recharge, and feel at home during
+      your visit.
+    </p>
+    <div class="meta meta-bright">
+      <div>
+        <strong>9.9</strong> Guest rating
+      </div>
+      <div>
+        <strong>12</strong> Suites blessed by Dapang
+      </div>
+      <div>
+        <strong>08</strong> Steps to sunrise walk
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-card hero-card-bright">
+    <div class="frame-inner">
+      <ng-container *ngIf="heroImage(); else heroFallback">
+        <img [src]="heroImage()" alt="Featured room" class="frame-img" />
+      </ng-container>
+      <ng-template #heroFallback>
+        <div class="frame-img frame-fallback">Loading room...</div>
+      </ng-template>
+      <div class="frame-overlay">
+        <div class="frame-text">After-dark patrols</div>
+        <div class="frame-stats">
+          <span>Neon lamps</span>
+          <span>Ocean hush</span>
+          <span>Soft paws</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

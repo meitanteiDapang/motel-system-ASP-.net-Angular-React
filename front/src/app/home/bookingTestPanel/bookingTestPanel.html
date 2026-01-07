@@ -1,0 +1,27 @@
+<div class="booking-test">
+  <div class="test-card">
+    <div>
+      <p class="eyebrow">API probe</p>
+      <h2>Live test ping</h2>
+      <p class="subtext">
+        We call the backend test endpoint and surface its reply.
+      </p>
+    </div>
+    <div class="test-result">
+      <ng-container *ngIf="testProbeState().loading">
+        <span class="pill">Contacting API...</span>
+      </ng-container>
+      <ng-container *ngIf="!testProbeState().loading">
+        <span class="pill error-pill" *ngIf="testProbeState().error">
+          Failed: {{ testProbeState().error }}
+        </span>
+        <div class="pill success-pill" *ngIf="testProbeState().data && !testProbeState().error">
+          <div>{{ testProbeState().data?.message }}</div>
+          <div class="pill-subtext" *ngIf="testProbeState().data?.timestamp">
+            {{ testProbeState().data?.timestamp | date: 'short' }}
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>

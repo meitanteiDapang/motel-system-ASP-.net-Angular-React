@@ -3,8 +3,8 @@ import { AfterViewInit, Component, ElementRef, QueryList, ViewChild, ViewChildre
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { firstValueFrom, from, of, switchMap } from 'rxjs';
 import { AdminBooking } from '../../../shared/types';
-import { AdminAuthService } from '../../admin-auth.service';
-import { AdminBookingsService } from '../../admin-bookings.service';
+import { AdminAuthService } from '../../adminAuthService';
+import { AdminBookingsService } from '../../adminBookingsService';
 
 const TIMELINE_PAGE_SIZE = 500;
 
@@ -89,7 +89,7 @@ const parseUtcDate = (value?: string) => {
   standalone: true,
   imports: [CommonModule],
   templateUrl: './timeline.html',
-  styleUrls: ['../../admin-shared.scss', './timeline.scss'],
+  styleUrls: ['../../adminShared.scss', './timeline.scss'],
 })
 export class BookingsTimelineComponent implements AfterViewInit {
   private readonly auth = inject(AdminAuthService);

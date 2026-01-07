@@ -1,0 +1,26 @@
+<section class="section highlights">
+  <div class="section-header">
+    <p class="eyebrow">Dapang manifesto</p>
+    <h2>Book your stay now!</h2>
+  </div>
+  <p class="subtext" *ngIf="roomTypesState().loading">Loading room types...</p>
+  <p class="subtext error-text" *ngIf="roomTypesState().error">
+    Failed to load room types: {{ roomTypesState().error }}
+  </p>
+  <div class="grid three" *ngIf="!roomTypesState().loading && !roomTypesState().error">
+    <div class="highlight-card bright-card" *ngFor="let room of roomTypesState().data | slice:0:4">
+      <div class="img-wrap">
+        <img [src]="room.imageUrl" [alt]="room.typeName" />
+      </div>
+      <h3>{{ room.typeName }}</h3>
+      <p>
+        {{ room.bedNumber }} beds · ${{ room.price }}
+      </p>
+      <div class="card-actions">
+        <button class="book-btn" type="button" (click)="book.emit(room.id)">
+          Book
+        </button>
+      </div>
+    </div>
+  </div>
+</section>

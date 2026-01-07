@@ -4,7 +4,7 @@ import { BookingComponent } from './booking/booking';
 import { BookingSuccessComponent } from './booking/success/success';
 import { AdminLoginComponent } from './admin/login/login';
 import { AdminPageComponent } from './admin/page/page';
-import { adminAuthGuard } from './admin/admin-auth.guard';
+import { adminAuthGuard } from './admin/adminAuthGuard';
 
 export const routes: Routes = [
   {

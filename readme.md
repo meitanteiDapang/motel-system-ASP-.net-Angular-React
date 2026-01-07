@@ -146,3 +146,19 @@ az acr login -n "$ACR_NAME"
 ### 9) GitHub Actions note
 These scripts are for manual testing; GitHub Actions uses its own steps that are equivalent, and it does not run these scripts.  
 Actions does: Azure login (OIDC), ACR login, build/push front + API images, set AKS context, and Helm deploy.
+
+## GitHub Actions Azure secrets (3 values to set)
+Actions needs three Azure values as repository/organization secrets:
+- `AZURE_CLIENT_ID` (app registration / workload identity app)
+- `AZURE_TENANT_ID` (directory ID)
+- `AZURE_SUBSCRIPTION_ID` (subscription ID)
+
+How to obtain:
+1) Tenant ID: `az account show --query tenantId -o tsv`
+2) Subscription ID: `az account show --query id -o tsv`
+3) Client ID (for the federated app you created for GitHub OIDC):
+   - If already created: `az ad sp list --display-name "<app-name>" --query "[0].appId" -o tsv`
+   - To create a new one quickly (replace NAME):  
+     `az ad app create --display-name "<NAME>-gha"`  
+     `az ad sp create --id $(az ad app list --display-name "<NAME>-gha" --query "[0].appId" -o tsv)`  
+     The resulting `appId` is your `AZURE_CLIENT_ID`. Add a federated credential for your repo in the Azure Portal (Entra ID → App registrations → <NAME>-gha → Certificates & secrets → Federated credentials).

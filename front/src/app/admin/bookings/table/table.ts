@@ -3,8 +3,8 @@ import { Component, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { catchError, combineLatest, of, switchMap, tap } from 'rxjs';
 import { AdminBooking } from '../../../shared/types';
-import { AdminAuthService } from '../../admin-auth.service';
-import { AdminBookingsService } from '../../admin-bookings.service';
+import { AdminAuthService } from '../../adminAuthService';
+import { AdminBookingsService } from '../../adminBookingsService';
 
 const formatRoomLabel = (roomTypeId?: number, roomNumber?: number) => {
   if (roomTypeId != null && roomNumber != null) {
@@ -24,7 +24,7 @@ const formatRoomLabel = (roomTypeId?: number, roomNumber?: number) => {
   standalone: true,
   imports: [CommonModule],
   templateUrl: './table.html',
-  styleUrls: ['../../admin-shared.scss', './table.scss'],
+  styleUrls: ['../../adminShared.scss', './table.scss'],
 })
 export class BookingsTableComponent {
   private readonly auth = inject(AdminAuthService);

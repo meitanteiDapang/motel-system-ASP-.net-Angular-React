@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { RoomTypesService } from '../../shared/room-types.service';
+import { RoomTypesService } from '../../shared/roomTypesService';
 import { RoomType } from '../../shared/types';
 
 @Component({

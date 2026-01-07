@@ -4,8 +4,8 @@ import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { combineLatest, debounceTime, EMPTY, finalize, startWith, switchMap, tap, catchError } from 'rxjs';
-import { BookingService } from '../shared/booking.service';
-import { RoomTypesService } from '../shared/room-types.service';
+import { BookingService } from '../shared/bookingService';
+import { RoomTypesService } from '../shared/roomTypesService';
 import { Availability, RoomType } from '../shared/types';
 
 const sanitizePhone = (raw: string): string => {

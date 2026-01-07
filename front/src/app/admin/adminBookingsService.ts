@@ -1,9 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { catchError, map, throwError } from 'rxjs';
-import { ApiClientService } from '../shared/api-client.service';
+import { ApiClientService } from '../shared/apiClientService';
 import { AdminBooking } from '../shared/types';
-import { AdminAuthService } from './admin-auth.service';
+import { AdminAuthService } from './adminAuthService';
 
 export interface BookingsPage {
   bookings: AdminBooking[];
