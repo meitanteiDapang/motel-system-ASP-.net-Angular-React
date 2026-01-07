@@ -1,11 +1,10 @@
-name: Build & Deploy UI + API to AKS (dev)
+name: Build & Deploy Front + API to AKS (dev)
 
 on:
   workflow_dispatch:
   push:
     branches: ["main"]
     paths:
-      - "web/**"
       - "front/**"
       - "api/**"
       - "helm/**"
@@ -22,8 +21,7 @@ env:
   RELEASE: ecommerce
   CHART_PATH: ./helm/ecommerce
   ACR_NAME: acrecommercedev629
-  IMAGE_NAME: web
-  FRONT_IMAGE_NAME: front
+  IMAGE_NAME: front
   API_IMAGE_NAME: api
 
 jobs:
@@ -51,31 +49,19 @@ jobs:
       - name: Login to ACR
         run: az acr login -n $ACR_NAME
 
-      # 5. build & push React web image
-      - name: Build and push web image
-        run: |
-          ACR_LOGIN_SERVER=$(az acr show -n $ACR_NAME --query loginServer -o tsv)
-          echo "ACR_LOGIN_SERVER=$ACR_LOGIN_SERVER"
-
-          docker build \
-            -t $ACR_LOGIN_SERVER/$IMAGE_NAME:${IMAGE_TAG} \
-            ./web
-
-          docker push $ACR_LOGIN_SERVER/$IMAGE_NAME:${IMAGE_TAG}
-
-      # 5b. build & push Angular front image
+      # 5. build & push Angular front image
       - name: Build and push front image
         run: |
           ACR_LOGIN_SERVER=$(az acr show -n $ACR_NAME --query loginServer -o tsv)
           echo "ACR_LOGIN_SERVER=$ACR_LOGIN_SERVER"
 
           docker build \
-            -t $ACR_LOGIN_SERVER/$FRONT_IMAGE_NAME:${IMAGE_TAG} \
+            -t $ACR_LOGIN_SERVER/$IMAGE_NAME:${IMAGE_TAG} \
             ./front
 
-          docker push $ACR_LOGIN_SERVER/$FRONT_IMAGE_NAME:${IMAGE_TAG}
+          docker push $ACR_LOGIN_SERVER/$IMAGE_NAME:${IMAGE_TAG}
 
-      # 5c. build & push API image
+      # 5b. build & push API image
       - name: Build and push API image
         run: |
           ACR_LOGIN_SERVER=$(az acr show -n $ACR_NAME --query loginServer -o tsv)
@@ -100,7 +86,6 @@ jobs:
           helm upgrade --install $RELEASE $CHART_PATH \
             --namespace $NAMESPACE \
             --create-namespace \
-            --set web.image.tag=${IMAGE_TAG} \
             --set front.image.tag=${IMAGE_TAG} \
             --set ui.target=front \
             --set api.image.tag=${IMAGE_TAG}
