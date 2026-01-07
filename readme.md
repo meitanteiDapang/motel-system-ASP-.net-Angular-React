@@ -1,9 +1,9 @@
 ## Overview
-This is a demo for a motel system, covering both customer and admin experiences. Two different versions frontend are implemented. See [dapang.live](https://dapang.live) for a running angular example and [react.dapang.live](https://react.dapang.live) for react+typescript frontend.
+This is a demo for a motel system, covering both customer and admin experiences. See [dapang.live](https://dapang.live) for a running example.
 
 
 ## Tech Stack
-- Front-end: Angular or React+Typescript.
+- Front-end: Angular (default), React (partial implemented)
 - Backend API: ASP.NET Core 8 + EF Core
 - Database: PostgreSQL
 - CI/CD: GitHub Actions + Helm to Azure AKS

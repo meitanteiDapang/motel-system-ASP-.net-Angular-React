@@ -1,4 +1,5 @@
-{{- if .Values.front.enabled }}
+{{- $uiTarget := default "front" .Values.ui.target | lower }}
+{{- if eq $uiTarget "front" }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -11,10 +12,7 @@ spec:
     - name: http
       port: {{ .Values.front.servicePort }}
       targetPort: 80
-{{- end }}
-
-{{- if .Values.web.enabled }}
----
+{{- else if eq $uiTarget "web" }}
 apiVersion: v1
 kind: Service
 metadata:

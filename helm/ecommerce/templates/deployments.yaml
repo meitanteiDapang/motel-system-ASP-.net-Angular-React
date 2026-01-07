@@ -1,4 +1,5 @@
-{{- if .Values.front.enabled }}
+{{- $uiTarget := default "front" .Values.ui.target | lower }}
+{{- if eq $uiTarget "front" }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -20,10 +21,7 @@ spec:
           imagePullPolicy: {{ .Values.front.image.pullPolicy | default "IfNotPresent" }}
           ports:
             - containerPort: 80
-{{- end }}
-
-{{- if .Values.web.enabled }}
----
+{{- else if eq $uiTarget "web" }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
