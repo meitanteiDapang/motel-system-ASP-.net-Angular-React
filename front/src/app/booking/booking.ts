@@ -89,18 +89,18 @@ export class BookingComponent {
     const room = this.selectedRoom();
     const formValue = this.bookingForm.value;
     if (!room || !formValue.checkInDate || !formValue.checkOutDate) {
-      return null;
+      return { nights: 0, total: 0 };
     }
     const checkIn = new Date(formValue.checkInDate);
     const checkOut = new Date(formValue.checkOutDate);
     if (Number.isNaN(checkIn.getTime()) || Number.isNaN(checkOut.getTime())) {
-      return null;
+      return { nights: 0, total: 0 };;
     }
     if (checkOut <= checkIn) {
-      return null;
+      return { nights: 0, total: 0 };;
     }
     const nights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24));
-    if (nights <= 0) return null;
+    if (nights <= 0) return { nights: 0, total: 0 };;
     return { nights, total: nights * room.price };
   }
 
