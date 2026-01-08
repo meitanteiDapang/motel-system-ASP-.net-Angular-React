@@ -6,34 +6,24 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-
 namespace Ecommerce.Api.Endpoints;
 
-public static class AdminLoginEndpoints
+public static partial class AdminLoginEndpoints
 {
-    public static IEndpointRouteBuilder MapAdminLoginEndpoints(this IEndpointRouteBuilder endpoints)
-    {
-        endpoints.MapPost("/adminLogin", PostAdminLogin);
-        return endpoints;
-    }
-
     private static IResult PostAdminLogin(
-    string username,
-    string password,
-    IConfiguration configuration,
-    CancellationToken cancellationToken = default)
+        string username,
+        string password,
+        IConfiguration configuration,
+        CancellationToken cancellationToken = default)
     {
         var requestUsername = username;
         var requestPassword = password;
 
-        if (requestUsername != "admin" ||
-                requestPassword != "ps^word")
+        if (requestUsername != "admin" || requestPassword != "ps^word")
         {
             return Results.Json(
-                new { 
-                        message = "Not correct!" 
-                    },
-                    statusCode: StatusCodes.Status401Unauthorized);
+                new { message = "Not correct!" },
+                statusCode: StatusCodes.Status401Unauthorized);
         }
 
         var jwtSecret = configuration["Jwt:Secret"]
@@ -67,5 +57,4 @@ public static class AdminLoginEndpoints
             token = jwt
         });
     }
-
 }

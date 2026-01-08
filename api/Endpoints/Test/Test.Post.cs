@@ -1,32 +1,10 @@
-using System.IO.Pipelines;
 using System.Text;
 using Ecommerce.Api.My;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.VisualBasic;
-
 
 namespace Ecommerce.Api.Endpoints;
 
-public static class TestEndpoints
+public static partial class TestEndpoints
 {
-    public static HappyPublisher happyPublisher;
-    public static HappySubscriber happySubscriber = new HappySubscriber();
-
-    private static IEnumerator<int> happyDefferedList = happySubscriber.getList();
-
-    static TestEndpoints()
-    {
-        happyPublisher = new HappyPublisher();
-    }
-
-    public static IEndpointRouteBuilder MapTestEndpoints(this IEndpointRouteBuilder endpoints)
-    {
-        endpoints.MapPost("/test", GetPublishEvent);
-        return endpoints;
-    }
-
-
-
     private sealed record InputPayload(int input);
 
     private static async Task<IResult> GetPublishEvent(HttpRequest req)
@@ -35,7 +13,6 @@ public static class TestEndpoints
 
         var payload = await req.ReadFromJsonAsync<InputPayload>();
         var inputValue = payload?.input ?? 0;
-
 
         // publish, event
         happySubscriber.Subscribe(happyPublisher);
