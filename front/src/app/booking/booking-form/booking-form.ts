@@ -256,24 +256,6 @@ export class BookingFormComponent {
             return EMPTY;
           }
 
-          const checkIn = new Date(checkInDate);
-          const checkOut = new Date(checkOutDate);
-
-          if (
-            Number.isNaN(checkIn.getTime()) ||
-            Number.isNaN(checkOut.getTime())
-          ) {
-            this.availabilityError = "Please select valid dates.";
-            this.checking = false;
-            return EMPTY;
-          }
-
-          if (checkOut <= checkIn) {
-            this.availabilityError = "Check-out must be after check-in.";
-            this.checking = false;
-            return EMPTY;
-          }
-
           this.checking = true;
           return this.bookingService
             .checkAvailability({
@@ -317,7 +299,7 @@ export class BookingFormComponent {
   }
 
 
-  private emailValidator(
+  private  emailValidator(
     control: AbstractControl<string>
   ): ValidationErrors | null {
     const raw = control.value?.trim();
