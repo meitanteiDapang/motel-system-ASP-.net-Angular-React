@@ -9,25 +9,21 @@
   gap: 12px;
 }
 
-.availability {
-  font-size: 14px;
-  font-weight: 600;
-  color: #324863;
+.date-range-field {
+  width: 100%;
+}
+
+.booking-form mat-form-field {
+  width: 100%;
+}
+
+:host ::ng-deep .date-range-field .mat-mdc-form-field-hint {
+  color: #1b5e20;
 }
 
 .total-price {
   margin-top: 6px;
   color: #0f1626;
   font-size: clamp(16px, 2vw, 20px);
-  font-weight: 700;
-}
-
-.availability-error-text {
-  color: #d43c62;
-  font-weight: 700;
-}
-
-.availability-text {
-  color: #10d046;
   font-weight: 700;
 }

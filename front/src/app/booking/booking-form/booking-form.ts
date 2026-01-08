@@ -16,6 +16,11 @@ import {
   ValidationErrors,
   Validators,
 } from "@angular/forms";
+import { MatDatepickerModule } from "@angular/material/datepicker";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatInputModule } from "@angular/material/input";
+import { MatNativeDateModule } from "@angular/material/core";
+import { MatIconModule } from "@angular/material/icon";
 import { takeUntilDestroyed, toObservable } from "@angular/core/rxjs-interop";
 import {
   combineLatest,
@@ -29,7 +34,7 @@ import {
 } from "rxjs";
 import { BookingService } from "../../shared/booking-service";
 import { Availability, RoomType } from "../../shared/types";
-import { sanitizePhone, toIsoDate, isPhonePatternLegal, isEmailPatternLegal } from "../booking-helpers";
+import { sanitizePhone, toIsoDate, isPhonePatternLegal } from "../booking-helpers";
 
 const errorMessages = {
   nameRequired: "Please input your name.",
@@ -46,7 +51,15 @@ const errorMessages = {
 @Component({
   selector: "app-booking-form",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatIconModule,
+  ],
   templateUrl: "./booking-form.html",
   styleUrls: ["./booking-form.scss"],
 })
@@ -60,13 +73,22 @@ export class BookingFormComponent {
 
   @Output() readonly booked = new EventEmitter<{ roomTypeId: number }>();
 
-  readonly bookingForm = this.fb.nonNullable.group({
-    checkInDate: ["", [Validators.required, this.minDateValidator]],
-    checkOutDate: ["", Validators.required],
-    name: ["", Validators.required],
-    email: ["", [Validators.required, this.emailValidator]],
-    phone: ["", [Validators.required, this.phoneValidator]],
-  }, { validators: this.checkOutAfterCheckInValidator });
+  readonly bookingForm = this.fb.group(
+    {
+      checkInDate: this.fb.control<Date | null>(
+        null,
+        [Validators.required, BookingFormComponent.minDateValidator]
+      ),
+      checkOutDate: this.fb.control<Date | null>(null, Validators.required),
+      name: this.fb.nonNullable.control("", Validators.required),
+      email: this.fb.nonNullable.control("", [Validators.required, Validators.email]),
+      phone: this.fb.nonNullable.control(
+        "",
+        [Validators.required, BookingFormComponent.phoneValidator]
+      ),
+    },
+    { validators: BookingFormComponent.checkOutAfterCheckInValidator }
+  );
 
   availability: Availability | null = null;
   availabilityError = "";
@@ -75,25 +97,22 @@ export class BookingFormComponent {
   error = "";
 
   success = "";
-  readonly today = toIsoDate(new Date());
+  readonly today = BookingFormComponent.startOfDay(new Date());
 
   constructor() {
     this.setupAvailabilityWatcher();
   }
 
-  get minCheckOutDate(): string {
+  get minCheckOutDate(): Date {
     const checkIn = this.bookingForm.controls.checkInDate.value;
     if (!checkIn) {
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
-      return toIsoDate(tomorrow);
+      return BookingFormComponent.startOfDay(tomorrow);
     }
-    const parsed = new Date(checkIn);
-    if (Number.isNaN(parsed.getTime())) {
-      return this.today;
-    }
+    const parsed = BookingFormComponent.startOfDay(checkIn);
     parsed.setDate(parsed.getDate() + 1);
-    return toIsoDate(parsed);
+    return parsed;
   }
 
   get totalPrice() {
@@ -102,11 +121,8 @@ export class BookingFormComponent {
     if (!room || !formValue.checkInDate || !formValue.checkOutDate) {
       return { nights: 0, total: 0 };
     }
-    const checkIn = new Date(formValue.checkInDate);
-    const checkOut = new Date(formValue.checkOutDate);
-    if (Number.isNaN(checkIn.getTime()) || Number.isNaN(checkOut.getTime())) {
-      return { nights: 0, total: 0 };
-    }
+    const checkIn = BookingFormComponent.startOfDay(formValue.checkInDate);
+    const checkOut = BookingFormComponent.startOfDay(formValue.checkOutDate);
     if (checkOut <= checkIn) {
       return { nights: 0, total: 0 };
     }
@@ -196,7 +212,7 @@ export class BookingFormComponent {
       return;
     }
 
-    if (!this.isBookingFormFinished) {
+    if (!this.isBookingFormFinished || !formValue.checkInDate || !formValue.checkOutDate) {
       this.bookingForm.markAllAsTouched();
       this.error = "Please check your booking detail";
       return;
@@ -207,8 +223,8 @@ export class BookingFormComponent {
     this.bookingService
       .createBooking({
         roomTypeId: this.roomId(),
-        checkInDate: formValue.checkInDate,
-        checkOutDate: formValue.checkOutDate,
+        checkInDate: toIsoDate(formValue.checkInDate),
+        checkOutDate: toIsoDate(formValue.checkOutDate),
         name: formValue.name,
         email: formValue.email,
         phone: formValue.phone,
@@ -237,10 +253,10 @@ export class BookingFormComponent {
   private setupAvailabilityWatcher(): void {
     const roomTypeId$ = toObservable(this.roomId);
     const checkIn$ = this.bookingForm.controls.checkInDate.valueChanges.pipe(
-      startWith("")
+      startWith(null)
     );
     const checkOut$ = this.bookingForm.controls.checkOutDate.valueChanges.pipe(
-      startWith("")
+      startWith(null)
     );
 
     combineLatest([roomTypeId$, checkIn$, checkOut$])
@@ -256,12 +272,20 @@ export class BookingFormComponent {
             return EMPTY;
           }
 
+          const checkIn = BookingFormComponent.startOfDay(checkInDate);
+          const checkOut = BookingFormComponent.startOfDay(checkOutDate);
+
+          if (checkOut <= checkIn) {
+            this.checking = false;
+            return EMPTY;
+          }
+
           this.checking = true;
           return this.bookingService
             .checkAvailability({
               roomTypeId,
-              checkInDate,
-              checkOutDate,
+              checkInDate: toIsoDate(checkIn),
+              checkOutDate: toIsoDate(checkOut),
             })
             .pipe(
               tap((availability) => {
@@ -286,54 +310,43 @@ export class BookingFormComponent {
       .subscribe();
   }
 
-  private minDateValidator(
-    control: AbstractControl<string>
+  private static minDateValidator(
+    control: AbstractControl<Date | null>
   ): ValidationErrors | null {
-    const raw = control.value?.trim();
+    const raw = control.value;
     if (!raw) return null;
-    const parsed = BookingFormComponent.parseIsoDate(raw);
-    if (!parsed) return { minDate: true };
+    const parsed = BookingFormComponent.startOfDay(raw);
+    if (Number.isNaN(parsed.getTime())) return { minDate: true };
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     return parsed < today ? { minDate: true } : null;
   }
 
-
-  private  emailValidator(
-    control: AbstractControl<string>
-  ): ValidationErrors | null {
-    const raw = control.value?.trim();
-    if (!raw) return null;
-    return isEmailPatternLegal(raw) ? null : { email: true };
-  }
-
-  private phoneValidator(
-    control: AbstractControl<string>
+  private static phoneValidator(
+    control: AbstractControl<string | null>
   ): ValidationErrors | null {
     const raw = control.value?.trim();
     if (!raw) return null;
     return isPhonePatternLegal(raw) ? null : { phone: true };
   }
 
-  private checkOutAfterCheckInValidator(
+  private static checkOutAfterCheckInValidator(
     group: AbstractControl
   ): ValidationErrors | null {
     const form = group as FormGroup<{
-      checkInDate: AbstractControl<string>;
-      checkOutDate: AbstractControl<string>;
+      checkInDate: AbstractControl<Date | null>;
+      checkOutDate: AbstractControl<Date | null>;
     }>;
     const checkInRaw = form.controls.checkInDate.value;
     const checkOutRaw = form.controls.checkOutDate.value;
     if (!checkInRaw || !checkOutRaw) return null;
-    const checkIn = BookingFormComponent.parseIsoDate(checkInRaw);
-    const checkOut = BookingFormComponent.parseIsoDate(checkOutRaw);
-    if (!checkIn || !checkOut) return null;
+    const checkIn = BookingFormComponent.startOfDay(checkInRaw);
+    const checkOut = BookingFormComponent.startOfDay(checkOutRaw);
     return checkOut > checkIn ? null : { dateOrder: true };
   }
 
-  private static parseIsoDate(raw: string): Date | null {
+  private static startOfDay(raw: Date): Date {
     const parsed = new Date(raw);
-    if (Number.isNaN(parsed.getTime())) return null;
     parsed.setHours(0, 0, 0, 0);
     return parsed;
   }

@@ -1,3 +1,4 @@
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap');
 
 * {
@@ -134,13 +135,6 @@ body {
 
 .img-wrap:hover img {
   transform: scale(1.00);
-}
-
-.img-wrap {
-  border-radius: 14px;
-  overflow: hidden;
-  position: relative;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
 }
 
 .push-img-wrap img {

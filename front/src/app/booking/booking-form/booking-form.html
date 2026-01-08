@@ -1,72 +1,75 @@
 <form class="booking-form" [formGroup]="bookingForm" (ngSubmit)="handleSubmit()" novalidate>
   <div class="field-group">
-    <label class="field">
-      <span>Check-in</span>
-      <input type="date" formControlName="checkInDate" [min]="today" />
-    </label>
-    @if (checkInDateError) {
-      <span class="availability-error-text">{{ checkInDateError }}</span>
-    }
-    <label class="field">
-      <span>Check-out</span>
-      <input type="date" formControlName="checkOutDate" [min]="minCheckOutDate" />
-    </label>
-    @if (checkOutDateError) {
-      <span class="availability-error-text">{{ checkOutDateError }}</span>
-    }
+    <mat-form-field appearance="outline" class="date-range-field">
+      <mat-label>Stay</mat-label>
+      <mat-date-range-input [rangePicker]="picker" [min]="today">
+        <input matStartDate formControlName="checkInDate" placeholder="Check-in" />
+        <input matEndDate formControlName="checkOutDate" placeholder="Check-out" [min]="minCheckOutDate" />
+      </mat-date-range-input>
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-date-range-picker #picker></mat-date-range-picker>
+      @if (checkInDateError) {
+        <mat-error>{{ checkInDateError }}</mat-error>
+      }
+      @else if (checkOutDateError) {
+        <mat-error>{{ checkOutDateError }}</mat-error>
+      }
+      @else if (dateRangeError) {
+        <mat-error>{{ dateRangeError }}</mat-error>
+      }
+      @else if (checking) {
+        <mat-hint>Checking availability...</mat-hint>
+      }
+      @else if (availabilityError) {
+        <mat-error>{{ availabilityError }}</mat-error>
+      }
+      @else if (availability) {
+        <mat-hint>
+          {{ availability.available ? (availability.remaining + ' rooms left')
+          : 'Sold out for these dates.' }}
+        </mat-hint>
+      }
+      @else if (error) {
+        <mat-error>{{ error }}</mat-error>
+      }
+    </mat-form-field>
   </div>
-  @if (dateRangeError) {
-    <span class="availability-error-text">{{ dateRangeError }}</span>
-  }
-  @if(checking) {
-    <span class="availability-text">Checking availability...</span>
-    } @else if(availabilityError) {
-    <span class="availability-error-text">{{ availabilityError }}</span>
-    } @else if (availability) {
-    <span
-      [ngClass]="availability.available ? 'availability-text' : 'availability-error-text'"
-    >
-      {{ availability.available ? (availability.remaining + ' rooms left')
-      : 'Sold out for these dates.' }}
-    </span>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Name</mat-label>
+    <input matInput type="text" formControlName="name" placeholder="Your full name" />
+    @if (nameError) {
+      <mat-error>{{ nameError }}</mat-error>
     }
+  </mat-form-field>
 
-  <label class="field">
-    <span>Name</span>
-    <input type="text" formControlName="name" placeholder="Your full name" />
-  </label>
-  @if (nameError) {
-    <span class="availability-error-text">{{ nameError }}</span>
-  }
-
-  <label class="field">
-    <span>Email</span>
-    <input type="email" formControlName="email" placeholder="you@example.com" />
+  <mat-form-field appearance="outline">
+    <mat-label>Email</mat-label>
+    <input matInput type="email" formControlName="email" placeholder="you@example.com" />
     @if (emailError) {
-      <span class="availability-error-text">{{ emailError }}</span>
+      <mat-error>{{ emailError }}</mat-error>
     }
-  </label>
+  </mat-form-field>
 
-  <label class="field">
-    <span>Phone</span>
+  <mat-form-field appearance="outline">
+    <mat-label>Phone</mat-label>
     <input
+      matInput
       type="tel"
       formControlName="phone"
       inputmode="tel"
       (input)="onPhoneInput($event)"
       placeholder="+64 11 111 1111"
     />
-  </label>
-  @if (phoneError) {
-    <span class="availability-error-text">{{ phoneError }}</span>
-  }
+    @if (phoneError) {
+      <mat-error>{{ phoneError }}</mat-error>
+    }
+  </mat-form-field>
 
   <p class="subtext total-price">
     Total: ${{ totalPrice.total }} ({{ totalPrice.nights }} night{{
     totalPrice.nights === 1 ? '' : 's' }})
   </p>
-
-  <span class="availability-error-text">{{ error }}</span>
 
   <button class="book-btn primary" type="submit" [disabled]="bookingButtonDisabled">
     {{ submitting ? 'Booking...' : 'Confirm booking' }}
