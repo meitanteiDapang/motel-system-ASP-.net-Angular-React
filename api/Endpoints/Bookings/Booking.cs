@@ -1,6 +1,6 @@
 using System.Net.Mail;
 using System.Text.RegularExpressions;
-using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Ecommerce.Api.Endpoints;
 
@@ -8,40 +8,10 @@ public static partial class BookingEndpoints
 {
     public static IEndpointRouteBuilder MapBookingEndpoints(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapGet("/room-types/{roomTypeId:int}/availability", GetAvailability);
+        endpoints.MapGet("/bookings", GetBookings)
+            .RequireAuthorization(new AuthorizeAttribute { Roles = "admin" });
         endpoints.MapPost("/bookings", CreateBooking);
         return endpoints;
-    }
-
-    private static DateOnly GetNewZealandToday()
-    {
-        try
-        {
-            var timeZone = TimeZoneInfo.FindSystemTimeZoneById("Pacific/Auckland");
-            var localTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
-            return DateOnly.FromDateTime(localTime);
-        }
-        catch (TimeZoneNotFoundException)
-        {
-        }
-        catch (InvalidTimeZoneException)
-        {
-        }
-
-        try
-        {
-            var timeZone = TimeZoneInfo.FindSystemTimeZoneById("New Zealand Standard Time");
-            var localTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
-            return DateOnly.FromDateTime(localTime);
-        }
-        catch (TimeZoneNotFoundException)
-        {
-        }
-        catch (InvalidTimeZoneException)
-        {
-        }
-
-        return DateOnly.FromDateTime(DateTime.UtcNow);
     }
 
     private static bool IsValidEmail(string email)

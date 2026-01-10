@@ -2,7 +2,7 @@ import { apiUrl } from '../apiClient'
 
 export const requestAdminLogin = async (username: string, password: string): Promise<unknown> => {
   const params = new URLSearchParams({ username, password })
-  const res = await fetch(apiUrl(`/adminLogin?${params.toString()}`), {
+  const res = await fetch(apiUrl(`/admin/session?${params.toString()}`), {
     method: 'POST',
   })
 
@@ -22,7 +22,7 @@ export const requestAdminLogin = async (username: string, password: string): Pro
 
 
 export const requestCheckAdminToken = async (token: string): Promise<unknown> => {
-  const res = await fetch(apiUrl('/admin/checkAdminToken'), {
+  const res = await fetch(apiUrl('/admin/session'), {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${token}`,

@@ -21,7 +21,7 @@ export class AdminAuthService {
   login(username: string, password: string) {
     const params = new HttpParams().set('username', username).set('password', password);
     return this.http
-      .post<{ token?: string; message?: string }>(this.api.url('/adminLogin'), null, { params })
+      .post<{ token?: string; message?: string }>(this.api.url('/admin/session'), null, { params })
       .pipe(
         map((res) => {
           if (!res || typeof res !== 'object' || !res.token) {
@@ -86,7 +86,7 @@ export class AdminAuthService {
       Authorization: `Bearer ${token}`,
     });
     return this.http
-      .get(this.api.url('/admin/checkAdminToken'), { headers, observe: 'response' })
+      .get(this.api.url('/admin/session'), { headers, observe: 'response' })
       .pipe(map(() => true));
   }
 

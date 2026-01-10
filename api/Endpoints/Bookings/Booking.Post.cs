@@ -56,7 +56,7 @@ public static partial class BookingEndpoints
             return Results.BadRequest(new { message = "checkOutDate must be after checkInDate." });
         }
 
-        if (checkInDate < GetNewZealandToday())
+        if (checkInDate < DateHelpers.GetNewZealandToday())
         {
             return Results.BadRequest(new { message = "checkInDate cannot be before today's date (NZ time)." });
         }

@@ -1,64 +1,65 @@
-using System.Globalization;
 using Ecommerce.Api.Data;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce.Api.Endpoints;
 
 public static partial class BookingEndpoints
 {
-    private static async Task<IResult> GetAvailability(
-        int roomTypeId,
-        string? checkInDate,
-        string? checkOutDate,
+    private static async Task<IResult> GetBookings(
         AppDbContext db,
+        string? scope,
+        int? page,
+        int? pageSize,
         CancellationToken cancellationToken = default
     )
     {
-        if (roomTypeId <= 0 || string.IsNullOrWhiteSpace(checkInDate) || string.IsNullOrWhiteSpace(checkOutDate))
+        TimeZoneInfo nzTimeZone;
+        try
         {
-            return Results.BadRequest(new { message = "roomTypeId, checkInDate, and checkOutDate are required." });
+            nzTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Pacific/Auckland");
+        }
+        catch (TimeZoneNotFoundException)
+        {
+            nzTimeZone = TimeZoneInfo.FindSystemTimeZoneById("New Zealand Standard Time");
         }
 
-        if (!DateOnly.TryParseExact(checkInDate, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsedCheckIn))
+        var today = DateOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, nzTimeZone));
+        var query = db.Bookings.AsNoTracking();
+        if (string.Equals(scope, "future", StringComparison.OrdinalIgnoreCase))
         {
-            return Results.BadRequest(new { message = "checkInDate must be in yyyy-MM-dd format." });
+            query = query.Where(booking => booking.CheckInDate >= today);
         }
 
-        if (!DateOnly.TryParseExact(checkOutDate, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsedCheckOut))
-        {
-            return Results.BadRequest(new { message = "checkOutDate must be in yyyy-MM-dd format." });
-        }
+        var total = await query.CountAsync(cancellationToken);
 
-        if (parsedCheckOut <= parsedCheckIn)
-        {
-            return Results.BadRequest(new { message = "checkOutDate must be after checkInDate." });
-        }
+        var pageNumber = page.GetValueOrDefault(1);
+        var pageSizeValue = pageSize.GetValueOrDefault(20);
+        pageNumber = pageNumber < 1 ? 1 : pageNumber;
+        pageSizeValue = pageSizeValue < 1 ? 20 : pageSizeValue;
 
-        if (parsedCheckIn < GetNewZealandToday())
-        {
-            return Results.BadRequest(new { message = "checkInDate cannot be before today's date (NZ time)." });
-        }
-
-        var roomType = await db.RoomTypes
-            .Where(rt => rt.Id == roomTypeId)
-            .Select(rt => new { rt.Id, rt.AvailableRoomsNumber })
-            .SingleOrDefaultAsync(cancellationToken);
-
-        if (roomType is null)
-        {
-            return Results.NotFound(new { message = "Room type not found." });
-        }
-
-        var overlappingRoomNumbers = await db.BookedRooms
-            .Where(br => br.RoomTypeId == roomType.Id
-                         && br.CheckInDate < parsedCheckOut
-                         && br.CheckOutDate > parsedCheckIn)
-            .Select(br => br.RoomNumber)
-            .Distinct()
+        var bookings = await query
+            .OrderBy(booking => booking.CheckInDate)
+            .ThenBy(booking => booking.Id)
+            .Skip((pageNumber - 1) * pageSizeValue)
+            .Take(pageSizeValue)
+            .Select(booking => new
+            {
+                booking.Id,
+                booking.RoomTypeId,
+                CheckInDate = booking.CheckInDate.ToString("yyyy-MM-dd"),
+                CheckOutDate = booking.CheckOutDate.ToString("yyyy-MM-dd"),
+                RoomNumber = db.BookedRooms
+                    .Where(room => room.BookingId == booking.Id)
+                    .Select(room => (int?)room.RoomNumber)
+                    .FirstOrDefault(),
+                booking.GuestName,
+                booking.GuestEmail,
+                booking.GuestPhone
+            })
             .ToListAsync(cancellationToken);
 
-        var remaining = Math.Max(0, roomType.AvailableRoomsNumber - overlappingRoomNumbers.Count);
-
-        return Results.Ok(new { available = remaining > 0, remaining });
+        return Results.Ok(new { bookings, total });
     }
 }

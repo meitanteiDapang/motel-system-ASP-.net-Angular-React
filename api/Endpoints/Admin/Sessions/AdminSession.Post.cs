@@ -6,11 +6,11 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace Ecommerce.Api.Endpoints;
+namespace Ecommerce.Api.Endpoints.Admin;
 
-public static partial class AdminLoginEndpoints
+public static partial class AdminSessionEndpoints
 {
-    private static IResult PostAdminLogin(
+    private static IResult PostAdminSession(
         string username,
         string password,
         IConfiguration configuration,

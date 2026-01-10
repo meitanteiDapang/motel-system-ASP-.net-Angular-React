@@ -28,7 +28,7 @@ export class AdminBookingsService {
       .set('pageSize', pageSize.toString());
 
     return this.http
-      .get<unknown>(this.api.url('/admin/loadBookings'), { headers, params })
+      .get<unknown>(this.api.url('/bookings'), { headers, params })
       .pipe(
         map((payload) => this.normalize(payload)),
         catchError((error: HttpErrorResponse) => {

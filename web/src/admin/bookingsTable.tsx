@@ -44,7 +44,7 @@ const BookingsTable = () => {
           page: page.toString(),
           pageSize: PAGE_SIZE.toString(),
         })
-        const res = await fetch(apiUrl(`/admin/loadBookings?${params.toString()}`), {
+        const res = await fetch(apiUrl(`/bookings?${params.toString()}`), {
           headers: {
             Authorization: `Bearer ${token}`,
           },

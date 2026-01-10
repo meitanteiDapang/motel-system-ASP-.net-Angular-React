@@ -111,7 +111,7 @@ const BookingsTimeline = () => {
             page: page.toString(),
             pageSize: TIMELINE_PAGE_SIZE.toString(),
           })
-          const res = await fetch(apiUrl(`/admin/loadBookings?${params.toString()}`), {
+          const res = await fetch(apiUrl(`/bookings?${params.toString()}`), {
             headers: {
               Authorization: `Bearer ${token}`,
             },

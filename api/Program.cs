@@ -1,5 +1,5 @@
 using Ecommerce.Api.Endpoints;
-using Ecommerce.Api.Admin;
+using Ecommerce.Api.Endpoints.Admin;
 using Ecommerce.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -80,9 +80,7 @@ app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapCheckAdminTokenEndpoints();
-app.MapAdminLoginEndpoints();
-app.MapLoadBookingsEndpoints();
+app.MapAdminSessionEndpoints();
 app.MapHealthEndpoints();
 app.MapInfoEndpoints();
 app.MapRoomTypeEndpoints();
