@@ -7,7 +7,8 @@ public static partial class BookingEndpoints
 {
     private static async void DeleteBookings(
         AppDbContext db,
-        int? id
+        int? id,
+        CancellationToken cancellationToken = default
         )
     {
         return ;

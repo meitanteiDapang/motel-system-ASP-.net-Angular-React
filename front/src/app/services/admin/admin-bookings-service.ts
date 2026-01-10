@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { catchError, map, throwError } from 'rxjs';
 import { ApiClientService } from '../public/api-client-service';
-import { AdminBooking } from '../shared/types';
+import { AdminBooking } from '../../shared/types';
 import { AdminAuthService } from './admin-auth-service';
 
 export interface BookingsPage {

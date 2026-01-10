@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { catchError, map, throwError } from 'rxjs';
 import { ApiClientService } from './api-client-service';
-import { Availability, BookingResult } from './types';
+import { Availability, BookingResult } from '../../shared/types';
 
 interface AvailabilityParams {
   roomTypeId: number;

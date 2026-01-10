@@ -2,7 +2,7 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, EMPTY, tap } from 'rxjs';
 import { ApiClientService } from './api-client-service';
-import { RoomType } from './types';
+import { RoomType } from '../../shared/types';
 
 interface RoomTypesState {
   loading: boolean;
