@@ -32,28 +32,33 @@ export class BookingsTableComponent {
 
   readonly PAGE_SIZE = 20;
   readonly showFutureOnly = signal(true);
-  readonly page = signal(1);
+  private readonly allSinceDate = '1970-01-01';
 
   bookings: AdminBooking[] = [];
   loadError: string | null = null;
   total: number | null = null;
+  private lastFromDate: string | null = null;
+  private lastToken: string | null = null;
 
   constructor() {
     const token$ = toObservable(this.auth.token);
-    const scope$ = toObservable(this.showFutureOnly);
-    const page$ = toObservable(this.page);
+    const filter$ = toObservable(this.showFutureOnly);
 
-    combineLatest([token$, scope$, page$])
+    combineLatest([token$, filter$])
       .pipe(
-        switchMap(([token, showFuture, page]) => {
+        switchMap(([token, showFuture]) => {
           if (!token) {
             this.bookings = [];
             this.total = null;
             this.loadError = null;
             return of(null);
           }
-          const scope = showFuture ? 'future' : 'all';
-          return this.bookingsService.loadBookings(scope, page, this.PAGE_SIZE).pipe(
+          const fromDate = showFuture ? this.getNzToday() : this.allSinceDate;
+          if (token !== this.lastToken || fromDate !== this.lastFromDate) {
+            this.lastToken = token;
+            this.lastFromDate = fromDate;
+          }
+          return this.bookingsService.loadBookings(fromDate, this.PAGE_SIZE).pipe(
             tap(({ bookings, total }) => {
               this.bookings = bookings;
               this.total = total;
@@ -77,28 +82,11 @@ export class BookingsTableComponent {
   }
 
   get toggleLabel(): string {
-    return this.showFutureOnly() ? 'Show all' : 'Show future';
-  }
-
-  get pageCount(): number | null {
-    return this.total != null ? Math.max(1, Math.ceil(this.total / this.PAGE_SIZE)) : null;
-  }
-
-  get isNextDisabled(): boolean {
-    return this.total != null ? this.page() * this.PAGE_SIZE >= this.total : this.bookings.length < this.PAGE_SIZE;
+    return this.showFutureOnly() ? 'Show all (check-out)' : 'Show future (check-out)';
   }
 
   toggleScope(): void {
-    this.page.set(1);
     this.showFutureOnly.set(!this.showFutureOnly());
-  }
-
-  previousPage(): void {
-    this.page.update((value) => Math.max(1, value - 1));
-  }
-
-  nextPage(): void {
-    this.page.update((value) => value + 1);
   }
 
   formatRoomLabel(roomTypeId?: number, roomNumber?: number): string {
@@ -112,5 +100,18 @@ export class BookingsTableComponent {
     if (details) {
       details.removeAttribute('open');
     }
+  }
+
+  private getNzToday(): string {
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Pacific/Auckland',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+    const parts = formatter.formatToParts(new Date());
+    const pick = (type: Intl.DateTimeFormatPartTypes) =>
+      parts.find((part) => part.type === type)?.value ?? '';
+    return `${pick('year')}-${pick('month')}-${pick('day')}`;
   }
 }

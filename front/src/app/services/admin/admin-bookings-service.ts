@@ -16,15 +16,14 @@ export class AdminBookingsService {
   private readonly api = inject(ApiClientService);
   private readonly auth = inject(AdminAuthService);
 
-  loadBookings(scope: 'future' | 'all', page: number, pageSize: number) {
+  loadBookings(fromCheckOutDate: string, pageSize: number) {
     const headers = this.auth.authHeaders();
     if (!headers) {
       return throwError(() => new Error('Missing admin token.'));
     }
 
     const params = new HttpParams()
-      .set('scope', scope)
-      .set('page', page.toString())
+      .set('fromCheckOutDate', fromCheckOutDate)
       .set('pageSize', pageSize.toString());
 
     return this.http

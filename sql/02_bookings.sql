@@ -10,5 +10,7 @@ CREATE TABLE IF NOT EXISTS bookings (
   CHECK (check_out_date > check_in_date)
 );
 
-CREATE INDEX IF NOT EXISTS bookings_room_dates_idx
-  ON bookings (room_type_id, check_in_date, check_out_date);
+
+CREATE INDEX IF NOT EXISTS bookings_check_out_id_idx
+  ON bookings (check_out_date, id)
+  INCLUDE (check_in_date, room_type_id, guest_name, guest_email, guest_phone);

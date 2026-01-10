@@ -1,4 +1,4 @@
-import { useEffect, useState, JSX } from 'react'
+import { useEffect, useRef, useState, JSX } from 'react'
 import { useGlobalContext } from '../context/globalContext'
 import { apiUrl } from '../apiClient'
 import type { AdminBooking } from './AdminPage'
@@ -25,23 +25,62 @@ const BookingsTable = () => {
   const [bookings, setBookings] = useState<AdminBooking[]>([])
   const [loadError, setLoadError] = useState<string | null>(null)
   const [showFutureOnly, setShowFutureOnly] = useState(true)
-  const [page, setPage] = useState(1)
   const [total, setTotal] = useState<number | null>(null)
+  const bookingsCacheRef = useRef<AdminBooking[] | null>(null)
+  const totalCacheRef = useRef<number | null>(null)
+  const fromDateRef = useRef<string | null>(null)
+  const tokenRef = useRef<string | null>(null)
+  const allSinceDate = '1970-01-01'
 
-  // Load bookings when token, scope, or page changes.
+  const getNzToday = () => {
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Pacific/Auckland',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    })
+    const parts = formatter.formatToParts(new Date())
+    const pick = (type: Intl.DateTimeFormatPartTypes) => parts.find((part) => part.type === type)?.value ?? ''
+    return `${pick('year')}-${pick('month')}-${pick('day')}`
+  }
+
+  // Load bookings when token, filter, or page changes.
   useEffect(() => {
     if (!token) {
+      bookingsCacheRef.current = null
+      totalCacheRef.current = null
+      fromDateRef.current = null
+      tokenRef.current = null
       return
+    }
+
+    if (tokenRef.current !== token) {
+      tokenRef.current = token
+      bookingsCacheRef.current = null
+      totalCacheRef.current = null
+    }
+
+    const fromDate = showFutureOnly ? getNzToday() : allSinceDate
+    if (fromDateRef.current !== fromDate) {
+      fromDateRef.current = fromDate
+      bookingsCacheRef.current = null
+      totalCacheRef.current = null
     }
 
     // Prevent state updates if the component unmounts mid-request.
     let isActive = true
     const load = async () => {
       try {
-        const scope = showFutureOnly ? 'future' : 'all'
+        const cached = bookingsCacheRef.current
+        if (cached) {
+          setBookings(cached)
+          setTotal(totalCacheRef.current)
+          setLoadError(null)
+          return
+        }
+
         const params = new URLSearchParams({
-          scope,
-          page: page.toString(),
+          fromCheckOutDate: fromDate,
           pageSize: PAGE_SIZE.toString(),
         })
         const res = await fetch(apiUrl(`/bookings?${params.toString()}`), {
@@ -72,8 +111,11 @@ const BookingsTable = () => {
           !Array.isArray(payload) && typeof (payload as { total?: unknown }).total === 'number'
             ? Math.max(0, Math.floor((payload as { total: number }).total))
             : null
-        setBookings(items as AdminBooking[])
+        const bookingsPage = items as AdminBooking[]
+        setBookings(bookingsPage)
         setTotal(totalCount)
+        bookingsCacheRef.current = bookingsPage
+        totalCacheRef.current = totalCount
         setLoadError(null)
       } catch (err) {
         if (!isActive) return
@@ -93,16 +135,13 @@ const BookingsTable = () => {
     return () => {
       isActive = false
     }
-  }, [token, showFutureOnly, page])
+  }, [token, showFutureOnly])
 
   if (!token) {
     return null
   }
 
-  const toggleLabel = showFutureOnly ? 'Show all' : 'Show future'
-  const pageCount = total != null ? Math.max(1, Math.ceil(total / PAGE_SIZE)) : null
-  const isNextDisabled = total != null ? page * PAGE_SIZE >= total : bookings.length < PAGE_SIZE
-
+  const toggleLabel = showFutureOnly ? 'Show all (check-out)' : 'Show future (check-out)'
   const bookingRows = bookings.map((booking, index) => (
     <tr key={booking.id ?? `${booking.guestEmail ?? 'booking'}-${index}`}>
       <td>{booking.id ?? '-'}</td>
@@ -178,26 +217,9 @@ const BookingsTable = () => {
         {bookingsContent}
       </div>
       <div className="admin-pagination">
-        <button
-          className="book-btn admin-flat-btn"
-          type="button"
-          disabled={page === 1}
-          onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-        >
-          Previous
-        </button>
         <span className="admin-page-info">
-          Page {page}
-          {pageCount != null ? ` / ${pageCount}` : ''}
+          Showing {bookings.length}{total != null ? ` / ${total}` : ''}
         </span>
-        <button
-          className="book-btn admin-flat-btn"
-          type="button"
-          disabled={isNextDisabled}
-          onClick={() => setPage((prev) => prev + 1)}
-        >
-          Next
-        </button>
       </div>
     </>
   )

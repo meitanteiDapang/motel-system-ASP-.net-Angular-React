@@ -1,3 +1,4 @@
+using System.Globalization;
 using Ecommerce.Api.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,40 +8,36 @@ public static partial class BookingEndpoints
 {
     private static async Task<IResult> GetBookings(
         AppDbContext db,
-        string? scope,
-        int? page,
+        string? fromCheckOutDate,
         int? pageSize,
         CancellationToken cancellationToken = default
     )
     {
-        TimeZoneInfo nzTimeZone;
-        try
-        {
-            nzTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Pacific/Auckland");
-        }
-        catch (TimeZoneNotFoundException)
-        {
-            nzTimeZone = TimeZoneInfo.FindSystemTimeZoneById("New Zealand Standard Time");
-        }
-
-        var today = DateOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, nzTimeZone));
         var query = db.Bookings.AsNoTracking();
-        if (string.Equals(scope, "future", StringComparison.OrdinalIgnoreCase))
-        {
-            query = query.Where(booking => booking.CheckInDate >= today);
-        }
 
         var total = await query.CountAsync(cancellationToken);
 
-        var pageNumber = page.GetValueOrDefault(1);
         var pageSizeValue = pageSize.GetValueOrDefault(20);
-        pageNumber = pageNumber < 1 ? 1 : pageNumber;
         pageSizeValue = pageSizeValue < 1 ? 20 : pageSizeValue;
 
+        DateOnly fromDate = DateOnly.MinValue;
+        if (!string.IsNullOrWhiteSpace(fromCheckOutDate))
+        {
+            if (!DateOnly.TryParseExact(fromCheckOutDate, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsed))
+            {
+                return Results.BadRequest(new { message = "fromCheckOutDate must be in yyyy-MM-dd format." });
+            }
+            fromDate = parsed;
+        }
+
+        if (fromDate > DateOnly.MinValue)
+        {
+            query = query.Where(booking => booking.CheckOutDate >= fromDate);
+        }
+
         var bookings = await query
-            .OrderBy(booking => booking.CheckInDate)
+            .OrderBy(booking => booking.CheckOutDate)
             .ThenBy(booking => booking.Id)
-            .Skip((pageNumber - 1) * pageSizeValue)
             .Take(pageSizeValue)
             .Select(booking => new
             {

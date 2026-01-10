@@ -4,7 +4,7 @@ import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { firstValueFrom, from, of, switchMap } from 'rxjs';
 import { AdminBooking } from '../../../shared/types';
 import { AdminAuthService } from '../../../services/admin/admin-auth-service';
-import { AdminBookingsService } from '../../../services/admin/admin-bookings-service';
+import { AdminBookingsService, BookingsPage } from '../../../services/admin/admin-bookings-service';
 
 const TIMELINE_PAGE_SIZE = 500;
 
@@ -160,22 +160,13 @@ export class BookingsTimelineComponent implements AfterViewInit {
 
   private async loadAllBookings(): Promise<void> {
     try {
-      let page = 1;
-      let total: number | null = null;
       const all: AdminBooking[] = [];
-
-      while (true) {
-        const { bookings, total: totalCount } = await firstValueFrom(
-          this.bookingsService.loadBookings('all', page, TIMELINE_PAGE_SIZE),
-        );
-        all.push(...bookings);
-        total = total ?? totalCount ?? null;
-        const reachedTotal = total != null ? all.length >= total : bookings.length < TIMELINE_PAGE_SIZE;
-        if (bookings.length === 0 || reachedTotal) {
-          break;
-        }
-        page += 1;
-      }
+      const fromDate = '1970-01-01';
+      const page: BookingsPage = await firstValueFrom(
+        this.bookingsService.loadBookings(fromDate, TIMELINE_PAGE_SIZE),
+      );
+      const bookings: AdminBooking[] = page.bookings;
+      all.push(...bookings);
 
       this.bookings = all;
       this.loadError = null;

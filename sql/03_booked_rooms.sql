@@ -11,5 +11,5 @@ CREATE TABLE IF NOT EXISTS booked_rooms (
   UNIQUE (room_type_id, room_number, check_in_date, check_out_date)
 );
 
-CREATE INDEX IF NOT EXISTS booked_rooms_room_dates_idx
-  ON booked_rooms (room_type_id, room_number, check_in_date, check_out_date);
+CREATE INDEX IF NOT EXISTS booked_rooms_booking_id_room_number_idx
+  ON booked_rooms (booking_id, room_number);

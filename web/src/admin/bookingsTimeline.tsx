@@ -101,55 +101,35 @@ const BookingsTimeline = () => {
     let isActive = true
     const load = async () => {
       try {
-        let page = 1
-        let total: number | null = null
-        let all: AdminBooking[] = []
+        const params = new URLSearchParams({
+          fromCheckOutDate: '1970-01-01',
+          pageSize: TIMELINE_PAGE_SIZE.toString(),
+        })
+        const res = await fetch(apiUrl(`/bookings?${params.toString()}`), {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
 
-        while (true) {
-          const params = new URLSearchParams({
-            scope: 'all',
-            page: page.toString(),
-            pageSize: TIMELINE_PAGE_SIZE.toString(),
-          })
-          const res = await fetch(apiUrl(`/bookings?${params.toString()}`), {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          })
+        if (!isActive) return
 
-          if (!isActive) return
-
-          const data = await res.json().catch(() => null)
-          if (!res.ok) {
-            const errorMessage = (data as { message?: string } | null)?.message ?? `HTTP ${res.status}`
-            setLoadError(errorMessage)
-            setBookings([])
-            return
-          }
-
-          const payload = data as { bookings?: unknown; total?: unknown } | unknown[]
-          const items = Array.isArray(payload)
-            ? payload
-            : Array.isArray((payload as { bookings?: unknown }).bookings)
-              ? (payload as { bookings: unknown[] }).bookings
-              : []
-          const pageTotal =
-            !Array.isArray(payload) && typeof (payload as { total?: unknown }).total === 'number'
-              ? (payload as { total: number }).total
-              : null
-
-          all = all.concat(items as AdminBooking[])
-          total = total ?? pageTotal ?? null
-          // console.log('Bookings timeline loaded page', page, 'count', items.length, 'total', total)
-
-          const reachedTotal = total != null ? all.length >= total : items.length < TIMELINE_PAGE_SIZE
-          if (items.length === 0 || reachedTotal) {
-            break
-          }
-          page += 1
+        const data = await res.json().catch(() => null)
+        if (!res.ok) {
+          const errorMessage = (data as { message?: string } | null)?.message ?? `HTTP ${res.status}`
+          setLoadError(errorMessage)
+          setBookings([])
+          return
         }
 
-        setBookings(all)
+        const payload = data as { bookings?: unknown; total?: unknown } | unknown[]
+        const items = Array.isArray(payload)
+          ? payload
+          : Array.isArray((payload as { bookings?: unknown }).bookings)
+            ? (payload as { bookings: unknown[] }).bookings
+            : []
+
+        const bookingsPage = items as AdminBooking[]
+        setBookings(bookingsPage)
         setLoadError(null)
       } catch (err) {
         if (!isActive) return
