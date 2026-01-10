@@ -163,7 +163,7 @@ export class BookingsTimelineComponent implements AfterViewInit {
       const all: AdminBooking[] = [];
       const fromDate = '1970-01-01';
       const page: BookingsPage = await firstValueFrom(
-        this.bookingsService.loadBookings(fromDate, TIMELINE_PAGE_SIZE),
+        this.bookingsService.loadBookings(fromDate, 1, TIMELINE_PAGE_SIZE),
       );
       const bookings: AdminBooking[] = page.bookings;
       all.push(...bookings);

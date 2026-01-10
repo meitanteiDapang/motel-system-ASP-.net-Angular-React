@@ -9,16 +9,12 @@ public static partial class BookingEndpoints
     private static async Task<IResult> GetBookings(
         AppDbContext db,
         string? fromCheckOutDate,
+        int? page,
         int? pageSize,
         CancellationToken cancellationToken = default
     )
     {
         var query = db.Bookings.AsNoTracking();
-
-        var total = await query.CountAsync(cancellationToken);
-
-        var pageSizeValue = pageSize.GetValueOrDefault(20);
-        pageSizeValue = pageSizeValue < 1 ? 20 : pageSizeValue;
 
         DateOnly fromDate = DateOnly.MinValue;
         if (!string.IsNullOrWhiteSpace(fromCheckOutDate))
@@ -35,9 +31,17 @@ public static partial class BookingEndpoints
             query = query.Where(booking => booking.CheckOutDate >= fromDate);
         }
 
+        var total = await query.CountAsync(cancellationToken);
+
+        var pageNumber = page.GetValueOrDefault(1);
+        var pageSizeValue = pageSize.GetValueOrDefault(20);
+        pageNumber = pageNumber < 1 ? 1 : pageNumber;
+        pageSizeValue = pageSizeValue < 1 ? 20 : pageSizeValue;
+
         var bookings = await query
             .OrderBy(booking => booking.CheckOutDate)
             .ThenBy(booking => booking.Id)
+            .Skip((pageNumber - 1) * pageSizeValue)
             .Take(pageSizeValue)
             .Select(booking => new
             {

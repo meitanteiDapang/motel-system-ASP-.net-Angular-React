@@ -53,4 +53,25 @@
     </table>
   </div>
 
+  <div class="admin-pagination">
+    <button
+      class="book-btn admin-flat-btn"
+      type="button"
+      [disabled]="page() === 1"
+      (click)="previousPage()"
+    >
+      Previous
+    </button>
+    <span class="admin-page-info">
+      Page {{ page() }}{{ pageCount != null ? (' / ' + pageCount) : '' }}
+    </span>
+    <button
+      class="book-btn admin-flat-btn"
+      type="button"
+      [disabled]="isNextDisabled"
+      (click)="nextPage()"
+    >
+      Next
+    </button>
+  </div>
 </ng-container>

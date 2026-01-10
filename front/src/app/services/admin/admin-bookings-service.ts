@@ -16,7 +16,7 @@ export class AdminBookingsService {
   private readonly api = inject(ApiClientService);
   private readonly auth = inject(AdminAuthService);
 
-  loadBookings(fromCheckOutDate: string, pageSize: number) {
+  loadBookings(fromCheckOutDate: string, page: number, pageSize: number) {
     const headers = this.auth.authHeaders();
     if (!headers) {
       return throwError(() => new Error('Missing admin token.'));
@@ -24,6 +24,7 @@ export class AdminBookingsService {
 
     const params = new HttpParams()
       .set('fromCheckOutDate', fromCheckOutDate)
+      .set('page', page.toString())
       .set('pageSize', pageSize.toString());
 
     return this.http

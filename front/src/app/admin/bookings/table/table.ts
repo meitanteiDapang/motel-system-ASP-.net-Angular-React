@@ -32,21 +32,20 @@ export class BookingsTableComponent {
 
   readonly PAGE_SIZE = 20;
   readonly showFutureOnly = signal(true);
+  readonly page = signal(1);
   private readonly allSinceDate = '1970-01-01';
 
   bookings: AdminBooking[] = [];
   loadError: string | null = null;
   total: number | null = null;
-  private lastFromDate: string | null = null;
-  private lastToken: string | null = null;
-
   constructor() {
     const token$ = toObservable(this.auth.token);
     const filter$ = toObservable(this.showFutureOnly);
+    const page$ = toObservable(this.page);
 
-    combineLatest([token$, filter$])
+    combineLatest([token$, filter$, page$])
       .pipe(
-        switchMap(([token, showFuture]) => {
+        switchMap(([token, showFuture, page]) => {
           if (!token) {
             this.bookings = [];
             this.total = null;
@@ -54,11 +53,7 @@ export class BookingsTableComponent {
             return of(null);
           }
           const fromDate = showFuture ? this.getNzToday() : this.allSinceDate;
-          if (token !== this.lastToken || fromDate !== this.lastFromDate) {
-            this.lastToken = token;
-            this.lastFromDate = fromDate;
-          }
-          return this.bookingsService.loadBookings(fromDate, this.PAGE_SIZE).pipe(
+          return this.bookingsService.loadBookings(fromDate, page, this.PAGE_SIZE).pipe(
             tap(({ bookings, total }) => {
               this.bookings = bookings;
               this.total = total;
@@ -85,8 +80,25 @@ export class BookingsTableComponent {
     return this.showFutureOnly() ? 'Show all (check-out)' : 'Show future (check-out)';
   }
 
+  get pageCount(): number | null {
+    return this.total != null ? Math.max(1, Math.ceil(this.total / this.PAGE_SIZE)) : null;
+  }
+
+  get isNextDisabled(): boolean {
+    return this.total != null ? this.page() * this.PAGE_SIZE >= this.total : this.bookings.length < this.PAGE_SIZE;
+  }
+
   toggleScope(): void {
+    this.page.set(1);
     this.showFutureOnly.set(!this.showFutureOnly());
+  }
+
+  previousPage(): void {
+    this.page.update((value) => Math.max(1, value - 1));
+  }
+
+  nextPage(): void {
+    this.page.update((value) => value + 1);
   }
 
   formatRoomLabel(roomTypeId?: number, roomNumber?: number): string {
