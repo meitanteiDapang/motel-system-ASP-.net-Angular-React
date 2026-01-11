@@ -1,10 +1,10 @@
 import { useNavigate } from 'react-router-dom'
-import { useGlobalContext } from '../context/globalContext'
+import { useGlobalContext } from '../../context/globalContext'
 import './AdminShared.css'
 import './AdminPage.css'
 import { useEffect, useState } from 'react'
-import BookingsTable from './bookingsTable'
-import BookingsTimeline from './bookingsTimeline'
+import BookingsTable from './table/bookingsTable'
+import BookingsTimeline from './timeline/bookingsTimeline'
 
 export type AdminBooking = {
   id?: number

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { requestAvailability, requestCreateBooking } from './bookingApi'
-import type { Availability } from '../types'
+import type { Availability } from '../../types'
 
 interface BookingForm {
   checkInDate: string

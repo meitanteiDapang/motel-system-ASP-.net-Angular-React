@@ -1,8 +1,8 @@
 import { Route, Routes } from 'react-router-dom'
-import AdminLogin from './admin/AdminLogin'
-import AdminPage from './admin/AdminPage'
-import Booking from './booking/Booking'
-import BookingSuccess from './booking/BookingSuccess'
+import AdminLogin from './admin/adminLogin/AdminLogin'
+import AdminPage from './admin/adminPage/AdminPage'
+import Booking from './booking/bookingPage/Booking'
+import BookingSuccess from './booking/success/BookingSuccess'
 import HomePage from './home/HomePage'
 import './App.css'
 

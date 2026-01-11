@@ -1,8 +1,8 @@
 import { useCallback, useMemo, useState, type ChangeEvent } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useBooking } from './useBooking'
-import { useRoomTypes } from '../hooks/useRoomTypes'
-import type { RoomType } from '../types'
+import { useRoomTypes } from '../../hooks/useRoomTypes'
+import type { RoomType } from '../../types'
 import './booking.css'
 
 // Keep only digits and a single leading plus so the API receives a clean phone number.

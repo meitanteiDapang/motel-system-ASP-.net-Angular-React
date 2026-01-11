@@ -1,4 +1,4 @@
-import { apiUrl } from '../apiClient'
+import { apiUrl } from '../../apiClient'
 
 export const requestAdminLogin = async (username: string, password: string): Promise<unknown> => {
   const params = new URLSearchParams({ username, password })

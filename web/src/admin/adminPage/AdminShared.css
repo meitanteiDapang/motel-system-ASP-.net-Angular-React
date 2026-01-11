@@ -57,3 +57,24 @@
   box-shadow: none;
   background: #e8ecf4;
 }
+
+.admin-notice {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 1200;
+  max-width: min(420px, calc(100vw - 48px));
+}
+
+.admin-notice-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #1e2636;
+  border: 1px solid rgba(15, 22, 38, 0.12);
+  box-shadow: 0 12px 28px rgba(15, 22, 38, 0.16);
+  font-weight: 600;
+}

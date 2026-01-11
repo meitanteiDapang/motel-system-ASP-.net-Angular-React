@@ -41,13 +41,20 @@ export class AdminBookingsService {
       );
   }
 
-  deleteBookings(deletedBookingId: number) {
+  deleteBookings(deletedBookingIds: number[]) {
     const headers = this.auth.authHeaders();
     if (!headers) {
       return throwError(() => new Error('Missing admin token.'));
     }
 
-    const params = new HttpParams().set('bookingId', deletedBookingId);
+    if (!deletedBookingIds.length) {
+      return throwError(() => new Error('Missing booking ids.'));
+    }
+
+    let params = new HttpParams();
+    deletedBookingIds.forEach((id) => {
+      params = params.append('bookingIds', id.toString());
+    });
     return this.http.delete<unknown>(this.api.url('/bookings'), {
       headers,
       params,

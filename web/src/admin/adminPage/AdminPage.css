@@ -86,7 +86,7 @@ button {
 
 .admin-tab-panel {
   width: 100%;
-  overflow-x: auto;
+  overflow: visible;
 }
 
 .testing-panel {

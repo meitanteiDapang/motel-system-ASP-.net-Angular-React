@@ -33,7 +33,7 @@ export class AdminActionMenuComponent {
 
 
   toDelete(bookingId: number): void {
-    this.bookingsService.deleteBookings(bookingId).subscribe({
+    this.bookingsService.deleteBookings([bookingId]).subscribe({
       next: (result) => {
         this.noticeService.show(result.message);
         if (result.ok) {

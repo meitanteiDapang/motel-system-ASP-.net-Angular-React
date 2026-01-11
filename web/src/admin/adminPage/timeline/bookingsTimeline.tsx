@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useGlobalContext } from '../context/globalContext'
-import { apiUrl } from '../apiClient'
-import type { AdminBooking } from './AdminPage'
+import { useGlobalContext } from '../../../context/globalContext'
+import { apiUrl } from '../../../apiClient'
+import type { AdminBooking } from '../AdminPage'
 import './bookingsTimeline.css'
 
 const TIMELINE_PAGE_SIZE = 500

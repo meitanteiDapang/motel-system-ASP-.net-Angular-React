@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom'
 import { useState, useEffect, type ChangeEvent, type FormEvent } from 'react'
 import { useAdminLogin } from './useAdminLogin'
-import { useGlobalContext } from '../context/globalContext'
-import './AdminShared.css'
+import { useGlobalContext } from '../../context/globalContext'
+import '../adminPage/AdminShared.css'
 
 const AdminLogin = () => {
   const navigate = useNavigate()

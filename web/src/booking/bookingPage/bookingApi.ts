@@ -1,5 +1,5 @@
-import { apiUrl } from '../apiClient'
-import type { Availability, BookingResult } from '../types'
+import { apiUrl } from '../../apiClient'
+import type { Availability, BookingResult } from '../../types'
 
 interface AvailabilityParams {
   roomTypeId: number
